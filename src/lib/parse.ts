@@ -43,6 +43,17 @@ const SYSTEM = [
   /^null$/i,
 ];
 
+/** WhatsApp annotates message bodies in place. None of it is speech. */
+function clean(body: string): string {
+  return body
+    .replace(/<This message was edited>/gi, "")
+    .replace(/\(file attached\)/gi, "")
+    .replace(/<attached: [^>]*>/gi, "")
+    .replace(/\u200e/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function isSystem(sender: string, text: string): boolean {
   if (!text.trim()) return true;
   return SYSTEM.some((re) => re.test(text) || re.test(sender));
@@ -154,12 +165,15 @@ export function parseChat(raw: string, threadName: string): Thread {
     const sender = senderRaw.trim();
     if (isSystem(sender, body)) continue;
 
+    const text = clean(body);
+    if (!text) continue;
+
     messages.push({
       id: `${threadName}#${n++}`,
       thread: threadName,
       sender,
       ts,
-      text: body.trim(),
+      text,
     });
   }
 

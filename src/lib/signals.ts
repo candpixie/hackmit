@@ -85,24 +85,38 @@ function medianGapHours(messages: Message[]): number {
 const QUESTION_OPENERS =
   /^(are|is|do|does|did|can|could|would|will|should|have|has|was|were|what|when|where|who|why|how|any|you free|u free|wanna|want to|down to|still)/i;
 
-const PROMISE = [
+/**
+ * A promise needs two halves: a commitment, and something you would actually
+ * do together. Requiring both is what separates "we should get dinner" from
+ * "we need to hand this in by Wednesday" — in a student or work chat almost
+ * every "we need to" is logistics, and a blocklist of coursework words never
+ * keeps up. An activity word is the cheap, honest test for a social plan.
+ */
+const COMMITMENT = [
   { re: /\bwe should\b/i, w: 0.9 },
-  { re: /\bwe('| )?(ve)? (gotta|got to|need to|have to)\b/i, w: 0.9 },
-  { re: /\blet'?s\s+(?!know|see\b)/i, w: 0.7 },
+  { re: /\bwe('| )?(ve)? (gotta|got to|need to|have to)\b/i, w: 0.85 },
+  { re: /\blet'?s\s+(?!know|see\b)/i, w: 0.75 },
   { re: /\bnext time\b/i, w: 0.8 },
   { re: /\bwhen (you'?re|ur|i'?m) (back|home|in town|free)\b/i, w: 0.95 },
-  { re: /\bwe'?ll (do|go|catch|grab|plan)\b/i, w: 0.8 },
-  { re: /\bsometime (soon|this)\b/i, w: 0.7 },
+  { re: /\bwe'?ll (do|go|catch|grab|plan)\b/i, w: 0.85 },
+  { re: /\bsometime (soon|this)\b/i, w: 0.75 },
   { re: /\brain ?check\b/i, w: 0.9 },
-  { re: /\bi(')?ll (visit|come|swing by|call you)\b/i, w: 0.85 },
+  { re: /\bi(')?ll (visit|come|swing by|call you)\b/i, w: 0.9 },
+  { re: /\bwe have to (meet|hang|catch|do this|go)\b/i, w: 0.95 },
 ];
+
+const ACTIVITY =
+  /\b(meet ?up|meet|catch ?up|hang ?out|hang|see you|dinner|lunch|brunch|breakfast|supper|coffee|tea|drinks?|eat|food|restaurant|bar|cafe|movie|film|cinema|concert|gig|show|festival|trip|travel|holiday|vacation|visit|come over|your place|my place|call|facetime|video chat|party|birthday|wedding|beach|hike|walk|run|gym|swim|museum|exhibition|gallery|pottery|cook|bake|game|karaoke|shopping|market|road ?trip|weekend|celebrate|celebration)\b/i;
+
+const PROMISE = COMMITMENT;
+
 
 const WANT = [
   { re: /\bi'?ve always wanted\b/i, w: 0.95 },
   { re: /\bi'?ve been (wanting|meaning) to\b/i, w: 0.9 },
   { re: /\b(dying|desperate) to\b/i, w: 0.85 },
   { re: /\bi'?m obsessed with\b/i, w: 0.8 },
-  { re: /\bi really (want|need)\b/i, w: 0.8 },
+  { re: /\bi really (want|need)\b(?!\s+(help|to know|advice))/i, w: 0.8 },
   { re: /\bon my (bucket ?list|list)\b/i, w: 0.85 },
   { re: /\bi wish i (could|had)\b/i, w: 0.7 },
   { re: /\bsaving up for\b/i, w: 0.8 },
@@ -115,6 +129,36 @@ const MILESTONE = [
   { re: /\b(broke up|breakup|we split)\b/i, w: 0.8 },
   { re: /\b(started|starting) (at|my|a new)\b/i, w: 0.7 },
 ];
+
+/**
+ * "we need to hand this in by Wednesday" is not a plan with a friend, it is
+ * logistics. Student and work chats are mostly logistics, so a promise that
+ * smells of coursework or scheduling is kept but pushed well down the ranking
+ * rather than dropped, since the occasional real one hides in there.
+ */
+const LOGISTICS =
+  /\b(deadline|due|hand ?in|submit|submission|assignment|homework|\bhw\b|essay|coursework|rubric|marks|grading|graded|exam|quiz|midterm|revision|syllabus|slides?|presentation|google (doc|drive|slides?)|gdoc|drive folder|spreadsheet|attendance|zoom link|meeting|agenda|invoice|shift|roster|send me the|photo of|screenshot|file|link|password|login|form|sign ?up)\b/i;
+
+function logisticsPenalty(text: string): number {
+  return LOGISTICS.test(text) ? 0.3 : 1;
+}
+
+/**
+ * "why are you waking up at 4am every day?" and "can you send me the file?"
+ * are both unanswered questions, but only one of them is worth reopening a
+ * friendship with. Questions about the person beat questions about the task.
+ */
+const PERSONAL =
+  /\b(you|u|ur|your|yr)\b[^?]*\b(ok|okay|alright|feel|feeling|doing|been|sleep|sleeping|tired|exhausted|stress|stressed|anxious|happy|sad|health|sick|better|home|family|mum|mom|dad|parents|sister|brother|birthday|move|moved|moving|job|work|uni|school|holiday|eat|eating|weekend|plans|free|miss|missed|love|alone|lonely|cope|coping|survive|awake|night|morning)\b/i;
+
+const ABOUT_THEM = /\b(how (are|r|have|hv|'?s) (you|u|ur|things|it going)|how you doing|you good|u good|are you ok|u ok|what happened|what'?s up with you)\b/i;
+
+function personalWeight(text: string): number {
+  if (ABOUT_THEM.test(text)) return 1.35;
+  if (LOGISTICS.test(text)) return 0.3;
+  if (PERSONAL.test(text)) return 1.2;
+  return 1;
+}
 
 function words(text: string): number {
   return text.trim().split(/\s+/).length;
@@ -224,7 +268,7 @@ function openLoops(messages: Message[], owner: string, now: number): Evidence[] 
         : `${m.sender} asked this ${silentFor} days ago. You never replied.`,
       // Dropping a question mid-conversation is a stronger signal than going
       // quiet, because you were there and it still went unanswered.
-      confidence: (spokeAfter ? 0.95 : 0.85) * substance(m.text),
+      confidence: (spokeAfter ? 0.95 : 0.85) * substance(m.text) * personalWeight(m.text),
     });
   }
 
@@ -233,6 +277,7 @@ function openLoops(messages: Message[], owner: string, now: number): Evidence[] 
 
 function matchPatterns(
   messages: Message[],
+  owner: string,
   patterns: { re: RegExp; w: number }[],
   kind: Evidence["kind"],
   reason: (m: Message) => string
@@ -240,6 +285,8 @@ function matchPatterns(
   const out: Evidence[] = [];
   for (const m of messages) {
     if (m.text.length < 12) continue;
+    // A commitment with nothing to do in it is coordination, not a plan.
+    if (kind === "promise" && !ACTIVITY.test(m.text)) continue;
     for (const p of patterns) {
       if (!p.re.test(m.text)) continue;
       out.push({
@@ -249,7 +296,12 @@ function matchPatterns(
         sender: m.sender,
         quote: trim(m.text),
         reason: reason(m),
-        confidence: p.w * substance(m.text),
+        confidence:
+          p.w *
+          substance(m.text) *
+          (kind === "promise" ? logisticsPenalty(m.text) : 1) *
+          // Their wants matter more than your own when reopening a friendship.
+          (kind === "want" && m.sender === owner ? 0.4 : 1),
       });
       break;
     }
@@ -349,7 +401,7 @@ export function analyseThread(thread: Thread, owner: string, now = Date.now()): 
 
   const evidence = dedupe([
     ...openLoops(messages, owner, now),
-    ...matchPatterns(messages, PROMISE, "promise", (m) => {
+    ...matchPatterns(messages, owner, PROMISE, "promise", (m) => {
       const d = daysBetween(m.ts, now);
       return m.sender === owner
         ? `You said this ${d} days ago. It never happened.`
@@ -357,12 +409,14 @@ export function analyseThread(thread: Thread, owner: string, now = Date.now()): 
     }),
     ...matchPatterns(
       messages,
+      owner,
       WANT,
       "want",
       (m) => `${m.sender === owner ? "You" : m.sender} mentioned wanting this.`
     ),
     ...matchPatterns(
       messages,
+      owner,
       MILESTONE,
       "milestone",
       (m) => `${m.sender === owner ? "You" : m.sender} shared this and it went unremarked.`
