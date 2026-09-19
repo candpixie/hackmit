@@ -9,11 +9,7 @@
  */
 
 import { NextResponse } from "next/server";
-import {
-  elasticConfigured,
-  searchAll,
-  type Hit,
-} from "@/lib/elastic";
+import { search, type Backend, type Hit } from "@/lib/search";
 import type { TieView } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -51,15 +47,22 @@ export type PlanCandidate = {
 
 /* ------------------------------------------------------------------ */
 
-async function gather(session: string, people: string[]): Promise<Hit[]> {
+async function gather(
+  session: string,
+  people: string[]
+): Promise<{ hits: Hit[]; backend: Backend }> {
   const results = await Promise.all(
-    PROBES.map((probe) => searchAll(session, probe, { size: 12, excludeOwner: true }))
+    PROBES.map((probe) => search(session, probe, { size: 12, excludeOwner: true }))
   );
+
+  const backend = results.find((r) => r.backend === "elasticsearch")
+    ? "elasticsearch"
+    : "in-memory";
 
   const seen = new Set<string>();
   const hits: Hit[] = [];
 
-  for (const hit of results.flat().sort((a, b) => b.score - a.score)) {
+  for (const hit of results.flatMap((r) => r.hits).sort((a, b) => b.score - a.score)) {
     if (!people.includes(hit.thread)) continue;
     if (seen.has(hit.msgId)) continue;
     if (hit.text.split(/\s+/).length < 6) continue;
@@ -75,7 +78,7 @@ async function gather(session: string, people: string[]): Promise<Hit[]> {
     perPerson.set(h.thread, list);
   }
 
-  return [...perPerson.values()].flat();
+  return { hits: [...perPerson.values()].flat(), backend };
 }
 
 const SYSTEM = `You plan one gathering for a group of friends who have drifted apart.
@@ -130,19 +133,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Pick at least two friends." }, { status: 400 });
   }
 
-  if (!elasticConfigured()) {
-    return NextResponse.json(
-      {
-        error:
-          "Group planning needs the search index. Set ELASTIC_URL and ELASTIC_API_KEY.",
-      },
-      { status: 503 }
-    );
-  }
-
   let hits: Hit[];
+  let backend: Backend;
   try {
-    hits = await gather(session, people);
+    ({ hits, backend } = await gather(session, people));
   } catch (e) {
     return NextResponse.json(
       { error: e instanceof Error ? e.message : "Search failed." },
@@ -162,6 +156,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       plans: fallbackPlans(hits, people),
       evidence: hits,
+      backend,
       model: "grounded template",
     });
   }
@@ -207,11 +202,12 @@ export async function POST(req: Request) {
       because: (p.because ?? []).filter((b) => known.has(b.msgId)),
     }));
 
-    return NextResponse.json({ plans, evidence: hits, model: MODEL });
+    return NextResponse.json({ plans, evidence: hits, backend, model: MODEL });
   } catch {
     return NextResponse.json({
       plans: fallbackPlans(hits, people),
       evidence: hits,
+      backend,
       model: "grounded template",
     });
   }

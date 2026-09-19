@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { KIND_LABEL, type Evidence, type TieView } from "@/lib/types";
+import { Recap } from "./Recap";
 
 type Draft = {
   message: string;
@@ -18,16 +19,26 @@ function when(ts: number): string {
   });
 }
 
-export function Detail({ tie, owner }: { tie: TieView; owner: string }) {
+export function Detail({
+  tie,
+  owner,
+  session,
+}: {
+  tie: TieView;
+  owner: string;
+  session: string;
+}) {
   const [draft, setDraft] = useState<Draft | null>(null);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState<string | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
+  const [tab, setTab] = useState<"unfinished" | "recap">("unfinished");
 
   // A new friend means a new draft.
   useEffect(() => {
     setDraft(null);
     setFailed(null);
+    setTab("unfinished");
   }, [tie.thread]);
 
   const used = useMemo(() => new Set(draft?.cites ?? []), [draft]);
@@ -75,11 +86,33 @@ export function Detail({ tie, owner }: { tie: TieView; owner: string }) {
         </dl>
       </header>
 
-      <div className="py-8">
-        <h3 className="font-mono text-[11px] uppercase tracking-[0.22em] text-faint">
-          What was left unfinished
-        </h3>
+      <div className="pt-8">
+        <div className="flex gap-6 border-b border-line">
+          {(
+            [
+              ["unfinished", "What was left unfinished"],
+              ["recap", "What it was like"],
+            ] as const
+          ).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              className={`-mb-px border-b pb-3 font-mono text-[11px] uppercase tracking-[0.22em] transition-colors ${
+                tab === key
+                  ? "border-ember text-bone"
+                  : "border-transparent text-faint hover:text-muted"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
 
+      {tab === "recap" ? (
+        <Recap session={session} thread={tie.thread} />
+      ) : (
+      <div className="pb-8">
         {tie.evidence.length === 0 ? (
           <p className="mt-5 text-[14px] text-muted">
             Nothing specific was left hanging here. The silence is the whole signal.
@@ -98,7 +131,9 @@ export function Detail({ tie, owner }: { tie: TieView; owner: string }) {
           </ul>
         )}
       </div>
+      )}
 
+      {tab === "unfinished" ? (
       <div className="border-t border-line pt-8">
         {!draft ? (
           <>
@@ -155,6 +190,7 @@ export function Detail({ tie, owner }: { tie: TieView; owner: string }) {
           </div>
         )}
       </div>
+      ) : null}
     </section>
   );
 }

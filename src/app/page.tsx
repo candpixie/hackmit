@@ -58,7 +58,7 @@ export default function Page() {
           setSelected(null);
         }}
       />
-      {selected ? <Detail tie={selected} owner={report.owner} /> : null}
+      {selected ? <Detail tie={selected} owner={report.owner} session={report.session} /> : null}
     </main>
   );
 }

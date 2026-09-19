@@ -223,8 +223,16 @@ function depth(messages: Message[]): Moment[] {
   const bar = Math.max(p95, 180);
 
   const out: Moment[] = [];
+  // People resend things. The same paragraph twice is one moment, not two.
+  const seen = new Set<string>();
+
   for (let i = 0; i < messages.length; i++) {
     if (messages[i].text.length < bar) continue;
+
+    const key = messages[i].text.slice(0, 80).toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+
     const slice = window(messages, i, 3);
     out.push(
       toMoment("depth", slice, "Someone stopped to actually write", messages[i].text.length / 40)
@@ -302,8 +310,14 @@ export function bookends(messages: Message[]): { first: Moment; last: Moment } |
   const sorted = [...messages].sort((a, b) => a.ts - b.ts);
   if (sorted.length < 20) return null;
 
+  // "fr" is a real first message and a terrible opening line. Start on the
+  // first thing either of you actually said, within the opening exchange.
+  const opening = sorted.slice(0, 60);
+  const substantive = opening.findIndex((m) => m.text.split(/\s+/).length >= 5);
+  const from = substantive >= 0 ? substantive : 0;
+
   return {
-    first: toMoment("first", sorted.slice(0, 4), "How it started", 0),
+    first: toMoment("first", sorted.slice(from, from + 4), "How it started", 0),
     last: toMoment("last", sorted.slice(-3), "The last thing either of you said", 0),
   };
 }
