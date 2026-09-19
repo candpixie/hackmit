@@ -463,3 +463,25 @@ export function headline(tie: Tie): string {
   }
   return `${tie.totalMessages} messages, then ${tie.silenceDays} days of nothing.`;
 }
+
+/* ------------------------------------------------------------------ */
+/* classification, for the search index                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The same tests the engine uses, exposed so they can be stored as filterable
+ * flags at index time. Classifying once on the way in means Elasticsearch can
+ * answer "every unanswered-looking question in the archive" as a filter rather
+ * than a scan.
+ */
+export function classify(text: string): {
+  isQuestion: boolean;
+  hasCommitment: boolean;
+  hasActivity: boolean;
+} {
+  return {
+    isQuestion: isQuestion(text),
+    hasCommitment: COMMITMENT.some((p) => p.re.test(text)),
+    hasActivity: ACTIVITY.test(text),
+  };
+}

@@ -43,9 +43,9 @@ app works with zero setup. To use a model:
 
 ```bash
 # .env.local
-LLM_BASE_URL=https://api.muse.meta.com/v1
-LLM_API_KEY=...
-LLM_MODEL=muse-spark
+LLM_BASE_URL=https://api.meta.ai/v1
+META_API_KEY=...
+LLM_MODEL=muse-spark-1.3
 ```
 
 The client is OpenAI-compatible, so any compatible endpoint works.

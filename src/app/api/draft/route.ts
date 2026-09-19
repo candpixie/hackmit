@@ -8,9 +8,9 @@ export const runtime = "nodejs";
  * anything else we might need to fall back to on hackathon wifi. Set
  * LLM_BASE_URL / LLM_API_KEY / LLM_MODEL in .env.local.
  */
-const BASE = process.env.LLM_BASE_URL ?? "https://api.muse.meta.com/v1";
-const KEY = process.env.LLM_API_KEY;
-const MODEL = process.env.LLM_MODEL ?? "muse-spark";
+const BASE = process.env.LLM_BASE_URL ?? "https://api.meta.ai/v1";
+const KEY = process.env.META_API_KEY ?? process.env.LLM_API_KEY;
+const MODEL = process.env.LLM_MODEL ?? "muse-spark-1.3";
 
 const SYSTEM = `You write one short message reopening a friendship that has gone quiet.
 
