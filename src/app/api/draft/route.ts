@@ -27,6 +27,20 @@ Return strict JSON only:
 
 "cites" lists the messageId of each piece of evidence you actually used.`;
 
+/**
+ * Models reach for em dashes whatever the prompt says, and they read as
+ * written-for-you rather than written-by-you in a text message. Cheaper to
+ * strip than to keep asking.
+ */
+function sanitise(text: string): string {
+  return text
+    .replace(/\s*[\u2014\u2013]\s*/g, ", ")
+    .replace(/\s*,\s*,/g, ",")
+    .replace(/,\s*([.?!])/g, "$1")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+}
+
 function brief(tie: TieView): string {
   const lines = tie.evidence.slice(0, 5).map((e) => {
     return `- id=${e.messageId} [${e.kind}] ${e.sender} said: "${e.quote}" (${e.reason})`;
@@ -124,7 +138,7 @@ export async function POST(req: Request) {
     const known = new Set(tie.evidence.map((e) => e.messageId));
     const cites = (parsed.cites ?? []).filter((id) => known.has(id));
 
-    return NextResponse.json({ message: parsed.message.trim(), cites, model: MODEL });
+    return NextResponse.json({ message: sanitise(parsed.message), cites, model: MODEL });
   } catch {
     // Never let a flaky endpoint take the demo down.
     return NextResponse.json({ ...fallback(tie), model: "grounded template" });
