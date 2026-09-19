@@ -1,0 +1,10 @@
+node_modules
+.next
+.env*
+!.env.example
+
+# Real WhatsApp exports. Never committed, never deployed.
+# Drop your own exports here for local testing.
+/data/private/
+*_chat.txt
+"WhatsApp Chat with "*.txt

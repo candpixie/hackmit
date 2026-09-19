@@ -1,0 +1,103 @@
+"use client";
+
+import { useRef, useState } from "react";
+
+type Props = {
+  onLoad: (files: { name: string; text: string }[] | null) => void;
+  busy: boolean;
+  error: string | null;
+};
+
+export function Landing({ onLoad, busy, error }: Props) {
+  const input = useRef<HTMLInputElement>(null);
+  const [over, setOver] = useState(false);
+
+  async function take(list: FileList | null) {
+    if (!list?.length) return;
+    const files = await Promise.all(
+      [...list]
+        .filter((f) => f.name.endsWith(".txt"))
+        .map(async (f) => ({ name: f.name, text: await f.text() }))
+    );
+    if (files.length) onLoad(files);
+  }
+
+  return (
+    <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center px-6 py-20">
+      <div className="rise">
+        <p className="mb-6 font-mono text-[11px] uppercase tracking-[0.22em] text-faint">
+          Overdue
+        </p>
+
+        <h1 className="font-serif text-5xl leading-[1.05] tracking-tight text-bone sm:text-6xl">
+          You have friendships
+          <br />
+          you are about to lose.
+        </h1>
+
+        <p className="mt-7 max-w-xl text-[17px] leading-relaxed text-muted">
+          Not the ones you argued with. The ones that just went quiet while you were
+          busy. Give Overdue your chat history and it will find them, tell you exactly
+          what was left unfinished, and write the one message that reopens it.
+        </p>
+
+        <div
+          onDragOver={(e) => {
+            e.preventDefault();
+            setOver(true);
+          }}
+          onDragLeave={() => setOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setOver(false);
+            void take(e.dataTransfer.files);
+          }}
+          className={`mt-12 rounded-xl border border-dashed p-10 text-center transition-colors ${
+            over ? "border-ember bg-ember/5" : "border-line bg-ink-soft"
+          }`}
+        >
+          <p className="text-[15px] text-bone">Drop your WhatsApp exports here</p>
+          <p className="mt-2 text-[13px] leading-relaxed text-faint">
+            Open a chat → Export Chat → Without Media. Any number of <code>.txt</code>{" "}
+            files.
+          </p>
+
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+            <button
+              onClick={() => input.current?.click()}
+              disabled={busy}
+              className="rounded-md bg-bone px-5 py-2.5 text-[14px] font-medium text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+            >
+              Choose files
+            </button>
+            <button
+              onClick={() => onLoad(null)}
+              disabled={busy}
+              className="rounded-md border border-line px-5 py-2.5 text-[14px] text-muted transition-colors hover:border-faint hover:text-bone disabled:opacity-50"
+            >
+              {busy ? "Reading…" : "Use the sample archive"}
+            </button>
+          </div>
+
+          <input
+            ref={input}
+            type="file"
+            accept=".txt"
+            multiple
+            hidden
+            onChange={(e) => void take(e.target.files)}
+          />
+        </div>
+
+        {error ? (
+          <p className="mt-5 text-[13px] text-ember">{error}</p>
+        ) : (
+          <p className="mt-5 text-[13px] leading-relaxed text-faint">
+            Your messages are parsed for this session and never stored. Nothing is
+            written to disk, and nothing leaves the page until you ask for a draft.
+          </p>
+        )}
+      </div>
+    </main>
+  );
+}
