@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { inferOwner, parseChat, type Thread } from "@/lib/parse";
 import { analyse, classify, headline } from "@/lib/signals";
 import { elasticConfigured, indexMessages, type IndexedMessage } from "@/lib/elastic";
+import { remember } from "@/lib/session";
 
 export const runtime = "nodejs";
 
@@ -30,6 +31,9 @@ async function build(uploads: Upload[]) {
   const ties = analyse(threads, owner).map((t) => ({ ...t, headline: headline(t) }));
 
   const session = randomUUID();
+
+  // The recap needs the messages themselves, not just what we derived from them.
+  remember(session, threads, owner);
 
   // Indexing is what makes cross-thread search possible, but the ranking above
   // does not depend on it, so a cluster that is down or absent costs us the

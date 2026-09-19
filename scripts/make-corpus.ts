@@ -54,14 +54,29 @@ function stamp(ts: number): string {
   )}:${p(d.getSeconds())} ${ampm}`;
 }
 
+// Roughly how a real thread reads: mostly ordinary, occasionally funny, and
+// every so often somebody writes a paragraph. The proportions matter, because
+// the recap looks for whatever stands out against them.
 const CHATTER = [
-  "lmaooo", "ok but same", "wait what", "no way", "stopppp", "i'm crying",
-  "did you see that", "send it", "omg", "yeah", "fr", "that's so real",
-  "i'm dying", "ok wait", "hold on", "coming", "on my way", "5 min",
-  "what time", "sounds good", "bet", "no thoughts", "literally me",
-  "i can't", "ok deal", "let me check", "maybe", "idk", "we'll see",
-  "good morning", "goodnight", "study group later?", "i failed that",
-  "i'm so tired", "same tbh", "one more week", "almost done",
+  "ok but same", "wait what", "no way", "send it", "omg", "yeah", "fr",
+  "that's so real", "ok wait", "hold on", "coming", "on my way", "5 min",
+  "sounds good", "bet", "literally me", "ok deal", "let me check", "maybe",
+  "idk", "we'll see", "good morning", "goodnight", "i failed that",
+  "i'm so tired", "same tbh", "one more week", "almost done", "did it work",
+  "call me later", "just got home", "you up", "nvm figured it out",
+  "that's rough", "proud of you", "tell me everything", "how'd it go",
+];
+
+const FUNNY = [
+  "lmaooo 😂", "stopppp 😭", "i'm crying 😂😂", "HAHAHAHA", "i'm dying 💀",
+  "hahahaha stop", "i can't 😭", "LMAO", "💀💀💀", "no thoughts",
+];
+
+const LONG = [
+  "ok sorry for the essay but i've been thinking about this all week and i genuinely don't know what to do. everyone keeps telling me to just pick one and i think that's the part i'm stuck on",
+  "i think i've been pretending i'm fine for so long that i forgot what the alternative feels like. anyway. that got heavy fast, ignore me",
+  "honestly the thing that got me was that nobody asked. like i would have said something if anyone had asked. and then i realised i also haven't asked anyone anything in months",
+  "not to be dramatic at 2am but i keep thinking about how much of this year i spent waiting for something to start. i don't want next year to be that",
 ];
 
 /**
@@ -85,7 +100,10 @@ function chatter(
       0;
     const d = new Date(ts);
     d.setHours(16 + Math.floor(rand() * 7), Math.floor(rand() * 60), Math.floor(rand() * 60));
-    lines.push({ ts: d.getTime(), sender: pick(senders), text: pick(CHATTER) });
+    // One in eight is funny, one in forty is somebody opening up.
+    const roll = rand();
+    const text = roll < 0.025 ? pick(LONG) : roll < 0.15 ? pick(FUNNY) : pick(CHATTER);
+    lines.push({ ts: d.getTime(), sender: pick(senders), text });
   }
 }
 
