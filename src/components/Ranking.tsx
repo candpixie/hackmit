@@ -6,6 +6,7 @@ type Props = {
   report: Report;
   selected: TieView | null;
   onSelect: (tie: TieView) => void;
+  onGroup: () => void;
   onReset: () => void;
 };
 
@@ -22,7 +23,7 @@ const TONE = {
   warm: "text-sage",
 } as const;
 
-export function Ranking({ report, selected, onSelect, onReset }: Props) {
+export function Ranking({ report, selected, onSelect, onGroup, onReset }: Props) {
   const dormant = report.ties.filter((t) => bucket(t) === "dormant").length;
 
   return (
@@ -49,7 +50,17 @@ export function Ranking({ report, selected, onSelect, onReset }: Props) {
         {report.sample ? " Sample archive." : ""}
       </p>
 
-      <ol className="mt-9 space-y-1">
+      <button
+        onClick={onGroup}
+        className="mt-7 w-full rounded-lg border border-line bg-card px-4 py-3.5 text-left transition-colors hover:border-ember"
+      >
+        <span className="text-[14px] text-bone">Get them all in one room</span>
+        <span className="mt-1 block text-[12px] leading-relaxed text-faint">
+          Search every thread at once for the thing they'd all actually want.
+        </span>
+      </button>
+
+      <ol className="mt-7 space-y-1">
         {report.ties.map((tie, i) => {
           const active = selected?.thread === tie.thread;
           const tone = TONE[bucket(tie)];
