@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Report, TieView } from "@/lib/types";
+import { Working, PLAN_STEPS } from "./Working";
 
 type Because = { person: string; quote: string; msgId: string };
 type Plan = {
@@ -152,6 +153,15 @@ export function Friendsgiving({ report, onBack }: { report: Report; onBack: () =
             {busy && !chosen ? "Searching all threads…" : "Find something they'd all want"}
           </button>
         </div>
+
+        {busy && !chosen ? (
+          <div className="mt-6 max-w-lg">
+            <Working
+              steps={PLAN_STEPS}
+              note="Searching four hundred conversations, then asking Muse to find what they would all enjoy."
+            />
+          </div>
+        ) : null}
 
         {picked.length < 2 ? (
           <p className="mt-3 text-[13px] text-faint">Pick at least two people.</p>

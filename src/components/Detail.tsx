@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { KIND_LABEL, type Evidence, type TieView } from "@/lib/types";
 import { Recap } from "./Recap";
+import { Working, DRAFT_STEPS } from "./Working";
 
 type Draft = {
   message: string;
@@ -137,16 +138,24 @@ export function Detail({
       <div className="border-t border-line pt-8">
         {!draft ? (
           <>
-            <button
-              onClick={write}
-              disabled={busy}
-              className="rounded-md bg-ember px-5 py-2.5 text-[14px] font-medium text-ink transition-opacity hover:opacity-90 disabled:opacity-60"
-            >
-              {busy ? "Writing…" : `Write to ${tie.friend.split(" ")[0]}`}
-            </button>
-            <p className="mt-3 text-[13px] text-faint">
-              Grounded in the messages above. Every claim stays clickable.
-            </p>
+            {busy ? (
+              <Working
+                steps={DRAFT_STEPS}
+                note="Muse Spark reasons before it writes, so this takes about twenty seconds."
+              />
+            ) : (
+              <>
+                <button
+                  onClick={write}
+                  className="rounded-md bg-ember px-5 py-2.5 text-[14px] font-medium text-ink transition-opacity hover:opacity-90"
+                >
+                  {`Write to ${tie.friend.split(" ")[0]}`}
+                </button>
+                <p className="mt-3 text-[13px] text-faint">
+                  Grounded in the messages above. Every claim stays clickable.
+                </p>
+              </>
+            )}
             {failed ? <p className="mt-3 text-[13px] text-ember">{failed}</p> : null}
           </>
         ) : (
