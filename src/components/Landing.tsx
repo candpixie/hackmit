@@ -1,10 +1,21 @@
 "use client";
 
+/**
+ * The first screen.
+ *
+ * It used to be a headline over two grey boxes, which said nothing about what
+ * the product finds and looked unfinished next to every other surface. It now
+ * shows the three signals with a real example of each, because the fastest way
+ * to explain this is to let someone read one of the things it pulls out.
+ *
+ * The loading state replaces the panel rather than sitting under it: while you
+ * are waiting, the wait is the screen.
+ */
+
 import { useRef, useState } from "react";
 import { Loading } from "./Loading";
 import { MuseKeyPanel } from "./MuseKey";
 import type { Stage } from "@/lib/useArchive";
-import Link from "next/link";
 
 type Props = {
   onLoad: (files: { name: string; text: string }[] | null) => void;
@@ -14,11 +25,31 @@ type Props = {
   error: string | null;
 };
 
+/** Real output, from the synthetic archive that ships with the repo. */
+const SIGNALS = [
+  {
+    kind: "Unanswered",
+    quote: "how did the showcase go?? you never told me",
+    note: "Asked 437 days ago. You kept talking. You never answered it.",
+  },
+  {
+    kind: "Never happened",
+    quote: "next time you're home let's finally do the ceramics thing",
+    note: "Raised 3 separate times. Never booked.",
+  },
+  {
+    kind: "They wanted",
+    quote: "i've always wanted to try ceramics, there's a studio two streets from me",
+    note: "Said once, in passing, never followed up on.",
+  },
+];
+
 export function Landing({ onLoad, onLoadDir, busy, stage, error }: Props) {
   // Prefilled: nobody should be typing a path correctly during a demo.
   const [dir, setDir] = useState("~/Downloads/inbox");
   const input = useRef<HTMLInputElement>(null);
   const [over, setOver] = useState(false);
+  const [showPaths, setShowPaths] = useState(false);
 
   async function take(list: FileList | null) {
     if (!list?.length) return;
@@ -31,125 +62,169 @@ export function Landing({ onLoad, onLoadDir, busy, stage, error }: Props) {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center px-6 py-20">
-      <div className="rise">
-        <Link href="/insights" className="mb-8 inline-flex rounded-full border border-line px-4 py-2 text-[13px] text-muted transition-colors hover:border-ember hover:text-bone">
-          Preview the Insights dashboard →
-        </Link>
-        <p className="mb-6 font-mono text-[11px] uppercase tracking-[0.22em] text-faint">
-          Insta Insights
-        </p>
+    <main
+      onDragOver={(e) => {
+        e.preventDefault();
+        setOver(true);
+      }}
+      onDragLeave={() => setOver(false)}
+      onDrop={(e) => {
+        e.preventDefault();
+        setOver(false);
+        void take(e.dataTransfer.files);
+      }}
+      className={`min-h-[calc(100vh-3.5rem)] transition-colors ${
+        over ? "bg-ember/[0.04]" : ""
+      }`}
+    >
+      <div className="mx-auto grid max-w-[1180px] gap-16 px-6 py-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,500px)] lg:gap-20 lg:py-24">
+        {/* the argument */}
+        <div className="rise">
+          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ember">
+            2026 · your year in DMs
+          </p>
 
-        <h1 className="font-serif text-5xl leading-[1.05] tracking-tight text-bone sm:text-6xl">
-          You have friendships
-          <br />
-          you are about to lose.
-        </h1>
+          <h1 className="mt-7 font-serif text-[52px] leading-[0.98] tracking-tight text-bone sm:text-[64px] lg:text-[72px]">
+            You have friendships
+            <br />
+            you are about to lose.
+          </h1>
 
-        <p className="mt-7 max-w-xl text-[17px] leading-relaxed text-muted">
-          Not the ones you argued with. The ones that just went quiet while you were
-          busy. Give Insta Insights your chat history and it will find them, tell you exactly
-          what was left unfinished, and write the one message that reopens it.
-        </p>
+          <p className="mt-8 max-w-lg text-[17px] leading-relaxed text-muted">
+            Not the ones you argued with. The ones that went quiet while you were
+            busy. Insta Insights reads your own messages and finds what was left
+            unfinished in each one.
+          </p>
 
-        {busy ? (
-          <div className="mt-12 rounded-xl border border-line bg-ink-soft p-10">
-            <Loading
-              stage={stage === "idle" ? "reading" : stage}
-              note="Four hundred conversations takes about half a minute. Nothing is uploaded, this is all happening on your machine."
-            />
-          </div>
-        ) : (
-          <>
-        <div
-            onDragOver={(e) => {
-              e.preventDefault();
-              setOver(true);
-            }}
-            onDragLeave={() => setOver(false)}
-            onDrop={(e) => {
-              e.preventDefault();
-              setOver(false);
-              void take(e.dataTransfer.files);
-            }}
-            className={`mt-12 rounded-xl border border-dashed p-10 text-center transition-colors ${
-              over ? "border-ember bg-ember/5" : "border-line bg-ink-soft"
-            }`}
-          >
-            <p className="text-[15px] text-bone">Drop your WhatsApp exports here</p>
-            <p className="mt-2 text-[13px] leading-relaxed text-faint">
-              Open a chat → Export Chat → Without Media. Any number of <code>.txt</code>{" "}
-              files.
-            </p>
-  
-            <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-              <button
-                onClick={() => input.current?.click()}
-                disabled={busy}
-                className="rounded-md bg-bone px-5 py-2.5 text-[14px] font-medium text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
-              >
-                Choose files
-              </button>
-              <button
-                onClick={() => onLoad(null)}
-                disabled={busy}
-                className="rounded-md border border-line px-5 py-2.5 text-[14px] text-muted transition-colors hover:border-faint hover:text-bone disabled:opacity-50"
-              >
-                {busy ? "Reading…" : "Use the sample archive"}
-              </button>
-            </div>
-  
-            <input
-              ref={input}
-              type="file"
-              accept=".txt"
-              multiple
-              hidden
-              onChange={(e) => void take(e.target.files)}
-            />
-          </div>
-  
-          <div className="mt-6 rounded-xl border border-line bg-ink-soft p-6">
-            <p className="text-[14px] text-bone">Or point it at an Instagram export</p>
-            <p className="mt-2 text-[13px] leading-relaxed text-faint">
-              Instagram → Your activity → Download your information → HTML. Give it the
-              path to the <code>inbox</code> folder.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <input
-                value={dir}
-                onChange={(e) => setDir(e.target.value)}
-                placeholder="~/Downloads/inbox"
-                spellCheck={false}
-                className="min-w-0 flex-1 rounded-md border border-line bg-card px-4 py-2.5 font-mono text-[13px] text-bone placeholder:text-faint"
-              />
-              <button
-                onClick={() => dir.trim() && onLoadDir(dir.trim())}
-                disabled={busy || !dir.trim()}
-                className="rounded-md border border-line px-5 py-2.5 text-[14px] text-muted transition-colors hover:border-ember hover:text-bone disabled:opacity-40"
-              >
-                Read it
-              </button>
-            </div>
-          </div>
-  
-            </>
-        )}
+          {/* show, do not describe */}
+          <ul className="mt-12 space-y-px overflow-hidden rounded-lg border border-line">
+            {SIGNALS.map((s) => (
+              <li key={s.kind} className="bg-card px-6 py-5">
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ember">
+                  {s.kind}
+                </p>
+                <p className="mt-2.5 font-serif text-[19px] leading-snug text-bone">
+                  “{s.quote}”
+                </p>
+                <p className="mt-2 text-[13px] leading-relaxed text-faint">{s.note}</p>
+              </li>
+            ))}
+          </ul>
 
-        <div className="mt-6">
-          <MuseKeyPanel />
+          <p className="mt-5 text-[13px] leading-relaxed text-faint">
+            Every one of them points at the message it came from, so you can check
+            any of it.
+          </p>
         </div>
 
-        {error ? (
-          <p className="mt-5 text-[13px] text-ember">{error}</p>
-        ) : (
-          <p className="mt-5 text-[13px] leading-relaxed text-faint">
-            Parsed on this machine. Nothing is written to disk. If search is
-            configured your messages are indexed in your own Elasticsearch under a
-            random session id, and asking for a draft sends the few quoted messages
-            to the model. Nothing else leaves.
-          </p>
-        )}
+        {/* the door */}
+        <div className="lg:pt-[4.5rem]">
+          <div className="rounded-xl border border-line bg-card p-8">
+            {busy ? (
+              <Loading
+                stage={stage === "idle" ? "reading" : stage}
+                note="Four hundred conversations takes about half a minute. Nothing is uploaded, this is happening on your machine."
+              />
+            ) : (
+              <>
+                <h2 className="font-serif text-[26px] leading-tight text-bone">
+                  Read your archive.
+                </h2>
+                <p className="mt-3 text-[14px] leading-relaxed text-muted">
+                  Nothing is uploaded. It is parsed here, on this machine.
+                </p>
+
+                <button
+                  onClick={() => onLoad(null)}
+                  className="mt-7 w-full rounded-md bg-ember px-5 py-3.5 text-[15px] font-medium text-ink transition-opacity hover:opacity-90"
+                >
+                  Try the sample archive
+                </button>
+                <p className="mt-2.5 text-center text-[12px] text-faint">
+                  Fake conversations, every feature working. No export needed.
+                </p>
+
+                <div className="my-7 flex items-center gap-4">
+                  <span className="h-px flex-1 bg-line" />
+                  <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-faint">
+                    or your own
+                  </span>
+                  <span className="h-px flex-1 bg-line" />
+                </div>
+
+                <div className="space-y-3">
+                  <button
+                    onClick={() => input.current?.click()}
+                    className="w-full rounded-md border border-line px-5 py-3 text-left transition-colors hover:border-ember"
+                  >
+                    <span className="text-[14px] text-bone">WhatsApp</span>
+                    <span className="mt-0.5 block text-[12px] leading-relaxed text-faint">
+                      Export Chat → Without Media. Choose the .txt, or drop it
+                      anywhere on this page.
+                    </span>
+                  </button>
+
+                  <div className="rounded-md border border-line px-5 py-3">
+                    <p className="text-[14px] text-bone">Instagram</p>
+                    <p className="mt-0.5 text-[12px] leading-relaxed text-faint">
+                      Your activity → Download your information → HTML. Give it the
+                      path to the <code>inbox</code> folder.
+                    </p>
+                    <div className="mt-3 flex gap-2">
+                      <input
+                        value={dir}
+                        onChange={(e) => setDir(e.target.value)}
+                        onKeyDown={(e) =>
+                          e.key === "Enter" && dir.trim() && onLoadDir(dir.trim())
+                        }
+                        spellCheck={false}
+                        className="min-w-0 flex-1 rounded border border-line bg-ink-soft px-3 py-2 font-mono text-[12px] text-bone"
+                      />
+                      <button
+                        onClick={() => dir.trim() && onLoadDir(dir.trim())}
+                        disabled={!dir.trim()}
+                        className="rounded bg-bone px-4 py-2 text-[13px] font-medium text-ink disabled:opacity-40"
+                      >
+                        Read it
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <input
+                  ref={input}
+                  type="file"
+                  accept=".txt"
+                  multiple
+                  hidden
+                  onChange={(e) => void take(e.target.files)}
+                />
+
+                {error ? <p className="mt-5 text-[13px] text-ember">{error}</p> : null}
+
+                <div className="mt-7 border-t border-line pt-5">
+                  <button
+                    onClick={() => setShowPaths((v) => !v)}
+                    className="font-mono text-[10px] uppercase tracking-[0.16em] text-faint transition-colors hover:text-bone"
+                  >
+                    Where your messages go
+                  </button>
+                  {showPaths ? (
+                    <p className="mt-3 text-[12px] leading-relaxed text-faint">
+                      Parsed on this machine, never written to disk. If search is
+                      configured they are indexed in your own Elasticsearch under a
+                      random session id. Asking for a draft sends the few quoted
+                      messages to the model. Nothing else leaves.
+                    </p>
+                  ) : null}
+                  <div className="mt-4">
+                    <MuseKeyPanel />
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </main>
   );

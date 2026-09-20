@@ -27,3 +27,4 @@ __pycache__/
 /mockups/shots/
 # Leftover build output from an earlier frontend experiment
 /web/
+.vercel
