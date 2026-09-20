@@ -11,7 +11,8 @@
     "ig": "node --experimental-strip-types scripts/ingest-instagram.ts",
     "ig-corpus": "node --experimental-strip-types scripts/make-instagram-corpus.ts",
     "check-elastic": "node --experimental-strip-types --env-file=.env.local scripts/check-elastic.ts",
-    "insights": "node --experimental-strip-types scripts/export-insights.ts"
+    "insights": "node --experimental-strip-types scripts/export-insights.ts",
+    "cards": "node --experimental-strip-types scripts/make-cards.ts"
   },
   "dependencies": {
     "next": "^16.3.5",
