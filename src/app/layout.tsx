@@ -15,7 +15,7 @@ const body = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Overdue",
+  title: "Insta Insights",
   description:
     "The friendships you're about to lose, and the one message that gets them back.",
 };

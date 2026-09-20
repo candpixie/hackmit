@@ -37,7 +37,7 @@ export function Ranking({ report, selected, onSelect, onGroup, onClosest, onRese
     <aside className="lg:sticky lg:top-12 lg:self-start">
       <div className="flex items-baseline justify-between">
         <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-faint">
-          Overdue
+          Insta Insights
         </p>
         <button
           onClick={onReset}

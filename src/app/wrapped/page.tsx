@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Overdue Wrapped.
+ * Insta Insights Wrapped.
  *
  * Six slides, arrow keys or click. The third one asks you to guess before it
  * tells you, which is the only moment in the whole product where the person
@@ -111,7 +111,7 @@ export default function WrappedPage() {
       <main className="flex min-h-screen items-center justify-center px-6">
         <div className="w-full max-w-lg">
           <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-faint">
-            Overdue
+            Insta Insights
           </p>
           <h1 className="mt-5 font-serif text-6xl leading-[0.95] tracking-tight text-bone">
             Your year
@@ -162,7 +162,7 @@ export default function WrappedPage() {
 
       <div className="flex items-baseline justify-between px-10 pt-5">
         <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-faint">
-          Overdue · Wrapped
+          Insta Insights · Wrapped
         </p>
         <p className="font-mono text-[11px] tabular-nums text-faint">
           {String(slide + 1).padStart(2, "0")} / {String(SLIDES).padStart(2, "0")}
@@ -225,10 +225,10 @@ function Cover({ d }: { d: Wrapped }) {
     <div className="mx-auto grid w-full max-w-6xl gap-16 lg:grid-cols-2 lg:items-center">
       <div>
         <Kicker>Your year in DMs</Kicker>
-        <h1 className="mt-6 font-serif text-[104px] leading-[0.85] tracking-tight text-bone">
-          Over
+        <h1 className="mt-6 font-serif text-[76px] leading-[0.88] tracking-tight text-bone">
+          Insta
           <br />
-          due
+          Insights
         </h1>
         <p className="mt-8 max-w-md text-[19px] leading-relaxed text-bone">
           The friendships you're about to lose, and the one message that gets them

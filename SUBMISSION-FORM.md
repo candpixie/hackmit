@@ -23,7 +23,7 @@ that reopens it.
 
 ## What it does
 
-Give Overdue your Instagram or WhatsApp export and it reads it on your machine.
+Give Insta Insights your Instagram or WhatsApp export and it reads it on your machine.
 
 **It finds four things you cannot find by scrolling.**
 

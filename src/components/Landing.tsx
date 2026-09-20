@@ -37,7 +37,7 @@ export function Landing({ onLoad, onLoadDir, busy, stage, error }: Props) {
           Preview the Insights dashboard →
         </Link>
         <p className="mb-6 font-mono text-[11px] uppercase tracking-[0.22em] text-faint">
-          Overdue
+          Insta Insights
         </p>
 
         <h1 className="font-serif text-5xl leading-[1.05] tracking-tight text-bone sm:text-6xl">
@@ -48,7 +48,7 @@ export function Landing({ onLoad, onLoadDir, busy, stage, error }: Props) {
 
         <p className="mt-7 max-w-xl text-[17px] leading-relaxed text-muted">
           Not the ones you argued with. The ones that just went quiet while you were
-          busy. Give Overdue your chat history and it will find them, tell you exactly
+          busy. Give Insta Insights your chat history and it will find them, tell you exactly
           what was left unfinished, and write the one message that reopens it.
         </p>
 

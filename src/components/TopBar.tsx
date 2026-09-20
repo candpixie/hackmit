@@ -28,7 +28,7 @@ export function TopBar() {
     <header className="sticky top-0 z-40 border-b border-line bg-ink/85 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-6 px-6">
         <a href="/" className="shrink-0 font-serif text-[20px] leading-none text-bone">
-          Overdue
+          Insta Insights
         </a>
 
         <nav aria-label="Surfaces" className="flex min-w-0 flex-1 items-center gap-1">

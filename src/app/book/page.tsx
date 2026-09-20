@@ -232,10 +232,10 @@ function Cover({ env }: { env: Envelope }) {
       </p>
 
       <div>
-        <h1 className="font-serif text-[64px] leading-[0.85] tracking-tight text-bone sm:text-[88px] lg:text-[120px] lg:leading-[0.82]">
-          Over
+        <h1 className="font-serif text-[46px] leading-[0.9] tracking-tight text-bone sm:text-[64px] lg:text-[86px] lg:leading-[0.86]">
+          Insta
           <br />
-          due
+          Insights
         </h1>
         <p className="mt-9 max-w-lg text-[19px] leading-relaxed text-bone">
           The friendships you're about to lose, and the one message that gets them

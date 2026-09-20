@@ -1,10 +1,10 @@
-# Overdue
+# Insta Insights
 
 **The friendships you're about to lose, and the one message that gets them back.**
 
 Candy Xie · Arav Chadha · Rafay Farah · Roman Stashkiv — HackMIT 2026
 
-Drop in your Instagram or WhatsApp export. Overdue reads it on your machine,
+Drop in your Instagram or WhatsApp export. Insta Insights reads it on your machine,
 finds the friendships that went quiet while you were busy, shows you exactly
 what was left unfinished in each one, writes the message that reopens it, and
 gets the whole group back in a room.

@@ -1,4 +1,4 @@
-# Overdue — HackMIT submission
+# Insta Insights — HackMIT submission
 
 **The friendships you're about to lose, and the one message that gets them back.**
 
@@ -22,7 +22,7 @@ surfaced were ones she had genuinely forgotten.
 
 ## How it strengthens connection
 
-Most apps in this space make you feel something and then leave. Overdue is built
+Most apps in this space make you feel something and then leave. Insta Insights is built
 to end in a sent message.
 
 **It finds what was left unfinished.** Four signals, none of them mood scores:
