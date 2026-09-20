@@ -61,7 +61,8 @@ if (!threads.length) {
   process.exit(1);
 }
 
-const envelope = buildCards(deduped, inferOwner(threads));
+const deduped = dedupeThreadNames(threads);
+const envelope = buildCards(deduped, inferOwner(deduped));
 writeFileSync(out, JSON.stringify(envelope, null, 2), "utf8");
 
 const byKind = new Map<string, number>();
