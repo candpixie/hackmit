@@ -9,11 +9,11 @@ import { readdir, readFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { NextResponse } from "next/server";
-import { inferOwner, type Thread } from "@/lib/parse";
+import { inferOwner, type Thread, dedupeThreadNames } from "@/lib/parse";
 import { parseInstagramHtml, threadNameFromFolder } from "@/lib/instagram";
 import { analyse, headline } from "@/lib/signals";
 import { wrappedStats } from "@/lib/wrapped";
-import { recall, remember } from "@/lib/session";
+import { recallDurable, remember } from "@/lib/session";
 import { randomUUID } from "node:crypto";
 
 export const runtime = "nodejs";
@@ -32,7 +32,7 @@ async function readInstagramDir(dir: string): Promise<Thread[]> {
     const t = parseInstagramHtml(merged, threadNameFromFolder(entry.name));
     if (t.messages.length) threads.push(t);
   }
-  return threads;
+  return dedupeThreadNames(threads);
 }
 
 function build(threads: Thread[], owner: string, session: string) {
@@ -103,7 +103,7 @@ export async function GET(req: Request) {
   const session = new URL(req.url).searchParams.get("session");
   if (!session) return NextResponse.json({ error: "No session." }, { status: 400 });
 
-  const held = recall(session);
+  const held = await recallDurable(session);
   if (!held) {
     return NextResponse.json({ error: "Session expired. Load again." }, { status: 410 });
   }

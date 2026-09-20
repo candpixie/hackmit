@@ -7,7 +7,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { parseInstagramHtml, threadNameFromFolder } from "../src/lib/instagram.ts";
-import { inferOwner } from "../src/lib/parse.ts";
+import { dedupeThreadNames, inferOwner } from "../src/lib/parse.ts";
 import { analyse, headline } from "../src/lib/signals.ts";
 import type { Thread } from "../src/lib/parse.ts";
 
@@ -45,16 +45,17 @@ if (!threads.length) {
   process.exit(1);
 }
 
-const owner = inferOwner(threads);
-const total = threads.reduce((n, t) => n + t.messages.length, 0);
-const ties = analyse(threads, owner);
+const deduped = dedupeThreadNames(threads);
+const owner = inferOwner(deduped);
+const total = deduped.reduce((n, t) => n + t.messages.length, 0);
+const ties = analyse(deduped, owner);
 
 const dim = (s: string) => `\x1b[2m${s}\x1b[0m`;
 const bold = (s: string) => `\x1b[1m${s}\x1b[0m`;
 
 console.log(
   `\n${bold("Overdue")} ${dim(
-    `— ${threads.length} conversations, ${total.toLocaleString()} messages, you are "${owner}"`
+    `— ${deduped.length} conversations, ${total.toLocaleString()} messages, you are "${owner}"`
   )}\n`
 );
 

@@ -19,7 +19,7 @@
  * app runs with no cluster at all and simply loses the cross-thread features.
  */
 
-import type { Message } from "./parse";
+import type { Message, Thread } from "./parse";
 
 const URL_ = process.env.ELASTIC_URL;
 const KEY = process.env.ELASTIC_API_KEY;
@@ -276,6 +276,69 @@ export async function promiseCandidates(session: string, size = 200): Promise<Hi
   });
 
   return toHits(res);
+}
+
+/**
+ * Rebuild a session's threads from the index.
+ *
+ * The in-memory store is a cache, not the record: a server restart used to
+ * drop every archive and every surface answered "that archive is no longer
+ * loaded". The messages are already indexed, so the session can be read back
+ * instead of reparsed.
+ */
+export async function rehydrate(
+  session: string
+): Promise<{ threads: Thread[]; owner: string } | null> {
+  const threads = new Map<string, Message[]>();
+  const ownerVotes = new Map<string, number>();
+
+  let after: unknown[] | undefined;
+
+  // search_after paginates past the 10k window a plain query stops at.
+  for (let page = 0; page < 200; page++) {
+    const res = await es(`/${INDEX}/_search`, {
+      method: "POST",
+      body: JSON.stringify({
+        size: 2000,
+        query: { bool: { filter: [{ term: { session } }] } },
+        sort: [{ ts: "asc" }, { msgId: "asc" }],
+        ...(after ? { search_after: after } : {}),
+      }),
+    });
+
+    const hits = res.hits?.hits ?? [];
+    if (!hits.length) break;
+
+    for (const h of hits) {
+      const src = h._source;
+      const list = threads.get(src.thread) ?? [];
+      list.push({
+        id: src.msgId,
+        thread: src.thread,
+        sender: src.sender,
+        ts: new Date(src.ts).getTime(),
+        text: src.text,
+      });
+      threads.set(src.thread, list);
+      if (src.isOwner) ownerVotes.set(src.sender, (ownerVotes.get(src.sender) ?? 0) + 1);
+    }
+
+    after = hits[hits.length - 1].sort;
+    if (hits.length < 2000) break;
+  }
+
+  if (!threads.size) return null;
+
+  const owner =
+    [...ownerVotes.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "You";
+
+  return {
+    owner,
+    threads: [...threads.entries()].map(([name, messages]) => {
+      const participants = [...new Set(messages.map((m) => m.sender))];
+      return { name, participants, isGroup: participants.length > 2, messages };
+    }),
+  };
 }
 
 /* ------------------------------------------------------------------ */

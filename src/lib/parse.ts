@@ -217,3 +217,27 @@ export function inferOwner(threads: Thread[]): string {
   const pool = everywhere.length ? everywhere : [...volume.keys()];
   return pool.sort((a, b) => (volume.get(b) ?? 0) - (volume.get(a) ?? 0))[0] ?? "You";
 }
+
+/**
+ * Two conversations can carry the same display name: deleted accounts all
+ * export as "Instagram user", and handles repeat. Message ids are built from
+ * the thread name, so a collision means one thread's messages overwrite
+ * another's in any store keyed by id. Eighteen conversations vanished this way
+ * on a real archive.
+ */
+export function dedupeThreadNames(threads: Thread[]): Thread[] {
+  const seen = new Map<string, number>();
+
+  return threads.map((t) => {
+    const n = seen.get(t.name) ?? 0;
+    seen.set(t.name, n + 1);
+    if (n === 0) return t;
+
+    const name = `${t.name} (${n + 1})`;
+    return {
+      ...t,
+      name,
+      messages: t.messages.map((m, i) => ({ ...m, thread: name, id: `${name}#${i}` })),
+    };
+  });
+}

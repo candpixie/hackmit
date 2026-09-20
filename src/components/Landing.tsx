@@ -144,8 +144,10 @@ export function Landing({ onLoad, onLoadDir, busy, stage, error }: Props) {
           <p className="mt-5 text-[13px] text-ember">{error}</p>
         ) : (
           <p className="mt-5 text-[13px] leading-relaxed text-faint">
-            Your messages are parsed for this session and never stored. Nothing is
-            written to disk, and nothing leaves the page until you ask for a draft.
+            Parsed on this machine. Nothing is written to disk. If search is
+            configured your messages are indexed in your own Elasticsearch under a
+            random session id, and asking for a draft sends the few quoted messages
+            to the model. Nothing else leaves.
           </p>
         )}
       </div>

@@ -3,7 +3,7 @@ import { homedir } from "node:os";
 import { readdir, readFile, stat } from "node:fs/promises";
 import { basename, extname, join } from "node:path";
 import { NextResponse } from "next/server";
-import { inferOwner, parseChat, type Thread } from "@/lib/parse";
+import { inferOwner, parseChat, type Thread, dedupeThreadNames } from "@/lib/parse";
 import { analyse, classify, headline } from "@/lib/signals";
 import { closeness, closenessHeadline } from "@/lib/closeness";
 import { elasticConfigured, indexMessages, type IndexedMessage } from "@/lib/elastic";
@@ -46,15 +46,17 @@ async function readInstagramDir(dir: string): Promise<Thread[]> {
     if (thread.messages.length) threads.push(thread);
   }
 
-  return threads;
+  return dedupeThreadNames(threads);
 }
 
 async function build(uploads: Upload[], preparsed?: Thread[]) {
   const threads: Thread[] =
     preparsed ??
-    uploads
-      .map((u) => parseChat(u.text, threadName(u.name)))
-      .filter((t) => t.messages.length > 0);
+    dedupeThreadNames(
+      uploads
+        .map((u) => parseChat(u.text, threadName(u.name)))
+        .filter((t) => t.messages.length > 0)
+    );
 
   if (!threads.length) {
     return { error: "No messages found. Export as .txt without media." };

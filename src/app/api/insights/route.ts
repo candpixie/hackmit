@@ -12,10 +12,10 @@ import { readdir, readFile } from "node:fs/promises";
 import { basename, extname, join } from "node:path";
 import { homedir } from "node:os";
 import { NextResponse } from "next/server";
-import { inferOwner, parseChat, type Thread } from "@/lib/parse";
+import { inferOwner, parseChat, type Thread, dedupeThreadNames } from "@/lib/parse";
 import { parseInstagramHtml, threadNameFromFolder } from "@/lib/instagram";
 import { buildInsights } from "@/lib/export";
-import { recall } from "@/lib/session";
+import { recallDurable } from "@/lib/session";
 
 export const runtime = "nodejs";
 
@@ -45,7 +45,7 @@ async function readInstagramDir(dir: string): Promise<Thread[]> {
     const thread = parseInstagramHtml(merged, threadNameFromFolder(entry.name));
     if (thread.messages.length) threads.push(thread);
   }
-  return threads;
+  return dedupeThreadNames(threads);
 }
 
 function options(url: URL) {
@@ -61,7 +61,7 @@ export async function GET(req: Request) {
 
   // An already-analysed session is the cheap path: nothing is re-parsed.
   if (session) {
-    const held = recall(session);
+    const held = await recallDurable(session);
     if (!held) {
       return NextResponse.json(
         { error: "That session is no longer loaded. Analyse again." },

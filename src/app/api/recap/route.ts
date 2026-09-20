@@ -11,7 +11,7 @@
 
 import { NextResponse } from "next/server";
 import { bookends, highlights, type Moment } from "@/lib/recap";
-import { recall } from "@/lib/session";
+import { recallDurable } from "@/lib/session";
 
 export const runtime = "nodejs";
 
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
     thread?: string;
   };
 
-  const held = session ? recall(session) : null;
+  const held = session ? await recallDurable(session) : null;
   if (!held) {
     return NextResponse.json(
       { error: "That archive is no longer loaded. Upload again." },

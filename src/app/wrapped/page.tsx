@@ -12,6 +12,7 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
+import { useArchive } from "@/lib/useArchive";
 
 type Evidence = { kind: string; quote: string; reason: string; messageId: string };
 type Tie = { thread: string; friend: string; silenceDays: number; totalMessages: number };
@@ -55,11 +56,22 @@ type Wrapped = {
 const SLIDES = 6;
 
 export default function WrappedPage() {
+  const { archive, checked } = useArchive();
   const [data, setData] = useState<Wrapped | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [dir, setDir] = useState("~/Downloads/inbox");
   const [busy, setBusy] = useState(false);
   const [slide, setSlide] = useState(0);
+
+  // Another surface already parsed this archive; re-reading it costs half a
+  // minute for nothing.
+  useEffect(() => {
+    if (!checked || !archive.session || data) return;
+    fetch(`/api/wrapped?session=${encodeURIComponent(archive.session)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d && setData(d as Wrapped))
+      .catch(() => {});
+  }, [checked, archive.session, data]);
 
   const go = useCallback((n: number) => {
     setSlide((s) => Math.min(Math.max(s + n, 0), SLIDES - 1));

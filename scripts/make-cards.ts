@@ -6,7 +6,7 @@
 
 import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { basename, extname, join } from "node:path";
-import { inferOwner, parseChat, type Thread } from "../src/lib/parse.ts";
+import { dedupeThreadNames, inferOwner, parseChat, type Thread } from "../src/lib/parse.ts";
 import { parseInstagramHtml, threadNameFromFolder } from "../src/lib/instagram.ts";
 import { buildCards } from "../src/lib/build-cards.ts";
 
@@ -61,7 +61,7 @@ if (!threads.length) {
   process.exit(1);
 }
 
-const envelope = buildCards(threads, inferOwner(threads));
+const envelope = buildCards(deduped, inferOwner(threads));
 writeFileSync(out, JSON.stringify(envelope, null, 2), "utf8");
 
 const byKind = new Map<string, number>();
