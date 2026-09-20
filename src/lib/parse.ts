@@ -15,6 +15,8 @@ export type Message = {
   sender: string;
   ts: number; // epoch ms
   text: string;
+  /** How many people reacted. Instagram only; absent for WhatsApp exports. */
+  reactions?: number;
 };
 
 export type Thread = {

@@ -70,6 +70,13 @@ function decode(html: string): string {
  * comes out as "Are you feeling better?❤️Summer (Sep 24, 2023 11:55 pm)".
  * Strip the parts nobody typed before decoding anything.
  */
+/** How many people reacted to this message. The list is stripped, the count is not. */
+function countReactions(cell: string): number {
+  const list = cell.match(/<ul[^>]*_a6-q[^>]*>([\s\S]*?)<\/ul>/i);
+  if (!list) return 0;
+  return (list[1].match(/<li\b/gi) ?? []).length;
+}
+
 function extractText(cell: string): string {
   const withoutReactions = cell.replace(/<ul[^>]*_a6-q[^>]*>[\s\S]*?<\/ul>/gi, "");
   const withoutShares = withoutReactions.replace(/<a\b[^>]*>[\s\S]*?<\/a>/gi, " ");
@@ -112,7 +119,7 @@ export function parseInstagramHtml(html: string, fallbackName: string): Thread {
   const titled = html.match(TITLE)?.[1];
   const name = titled ? decode(titled) : fallbackName;
 
-  const rows: { sender: string; text: string; ts: number }[] = [];
+  const rows: { sender: string; text: string; ts: number; reactions: number }[] = [];
 
   BLOCK.lastIndex = 0;
   let match: RegExpExecArray | null;
@@ -124,7 +131,7 @@ export function parseInstagramHtml(html: string, fallbackName: string): Thread {
     if (ts === null || !sender) continue;
     if (!isSpeech(text)) continue;
 
-    rows.push({ sender, text, ts });
+    rows.push({ sender, text, ts, reactions: countReactions(match[2]) });
   }
 
   // The export is newest first, and everything downstream assumes time runs
@@ -137,6 +144,7 @@ export function parseInstagramHtml(html: string, fallbackName: string): Thread {
     sender: r.sender,
     ts: r.ts,
     text: r.text,
+    reactions: r.reactions,
   }));
 
   const participants = [...new Set(messages.map((m) => m.sender))];
