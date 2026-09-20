@@ -408,8 +408,12 @@ function bothWanted(threads: Thread[], owner: string): Card[] {
   const where = (w: { thread: string; oneToOne: boolean }) =>
     w.oneToOne ? `to ${firstName(w.thread)}` : `in ${w.thread}`;
 
+  // Real people put adverbs in the middle of these. "i'm actually interested
+  // in" and "i wanna" were both dropped by a list that only knew "i'm
+  // interested in" and "i really want", which is how a 41,000 message archive
+  // came back with nothing.
   const WANT =
-    /\b(i'?ve always wanted|i'?ve been wanting|i really want|i'?m dying to|dying to|i wish i could|i want to try|i'?d love to|i'?m interested in|i really wanna)\b/i;
+    /\b(i'?ve (always |genuinely )?wanted|i'?ve been (wanting|meaning) to|i (really |genuinely |actually )?want(ed)? to|i'?m dying to|dying to|i wish i could|i'?d (really |genuinely )?love to|i'?m (actually |really |genuinely )?interested in|i (really |just )?wanna|one day i want|i should really)\b/i;
 
   /**
    * "i'd love to come see you" is an acceptance, not a wish. So is "i'd love
@@ -427,6 +431,11 @@ function bothWanted(threads: Thread[], owner: string): Card[] {
     for (const m of thread.messages) {
       const hit = m.text.match(WANT);
       if (!hit || hit.index === undefined) continue;
+
+      // The card shows the whole message, so the wish has to be what the
+      // message is about. Buried 200 characters into a paragraph on club
+      // politics, it matches on words nobody reading the quote can see.
+      if (hit.index > 80) continue;
 
       // Only the clause after the phrase. Taking the whole rest of a long
       // message lets two unrelated paragraphs share words by accident, which
