@@ -163,6 +163,7 @@ a.preview:hover { transform: translateY(-2px); }
 .more:hover { color: #fff; border-color: #555; }
 .more b { background: linear-gradient(90deg, #FCAF45, #E1306C); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
+.archiveLine{font-size:.7rem;color:#8e8e8e;margin:0 0 .5rem}
 .emptyPane{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;height:100%;max-width:34rem;padding:0 clamp(1.5rem,5vw,4rem);gap:.75rem}
 .emptyTitle{font-size:1.35rem;font-weight:600;letter-spacing:-.01em;margin:0}
 .emptyBody{color:#8e8e8e;line-height:1.6;margin:0}
@@ -297,7 +298,8 @@ a.preview:hover { transform: translateY(-2px); }
     <div class="list-label"><span id="listTitle"></span><span id="listCount"></span></div>
     <ul class="list" id="list"></ul>
     <div class="side-foot">
-      <div class="keys"><kbd>&uarr;</kbd><kbd>&darr;</kbd><span>chats</span><kbd>&larr;</kbd><kbd>&rarr;</kbd><span>pages</span></div>
+      <p id="archiveLine" class="archiveLine"></p>
+    <div class="keys"><kbd>&uarr;</kbd><kbd>&darr;</kbd><span>chats</span><kbd>&larr;</kbd><kbd>&rarr;</kbd><span>pages</span></div>
       <div class="made">made for Instagram DMs</div>
     </div>
   </aside>
@@ -593,6 +595,11 @@ function renderSide(page, cards, withEntrance) {
   $('pageName').textContent = page.name;
   $('pageDesc').textContent = page.desc;
   $('listTitle').textContent = 'Messages';
+  const who = $('archiveLine');
+  if (who && DATA) {
+    const n = (DATA.cards || []).length;
+    who.textContent = `${DATA.owner || 'you'} · ${n} cards in this archive`;
+  }
   $('listCount').textContent = cards.length === 0 ? 'none' : cards.length === 1 ? '1 chat' : `${cards.length} chats`;
   const rows = cards.map((card, i) => chatRow(card, i, selectedByPage[pageIndex]));
   if (!withEntrance) rows.forEach(row => { row.firstElementChild.style.animation = 'none'; });
