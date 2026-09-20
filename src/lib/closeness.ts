@@ -42,12 +42,12 @@ const WARMTH =
   /(😂|🤣|💀|😭|❤|🥹|🥰|😊|🫶|😘|hahaha|lmaoo|\blmao\b|\bily\b|love you|miss you|proud of you|thank you so much|so happy for you|congrats)/i;
 
 /**
- * Deliberately excludes "honestly" and "tbh". Both are filler in casual chat,
- * and counting them scored every thread at maximum candour, which made the
- * factor useless.
+ * Deliberately excludes "honestly", "tbh" and "i'm crying". The first two are
+ * filler, and in chat "crying" almost always means laughing. All three scored
+ * every thread at maximum candour, which flattened the ranking to nothing.
  */
 const CANDOUR =
-  /\b(i'?m scared|i'?m anxious|i'?m struggling|i cried|i'?m crying|i can'?t cope|i'?m not ok|i'?m not okay|i'?m exhausted|i'?m so tired|burnt? out|burning out|overwhelmed|can'?t sleep|i'?m stressed|so stressed|i'?m worried|i feel like|i felt|i don'?t know what to do|idk what to do|between us|don'?t tell|i'?ve never told|i need help|i'?m sorry for|i miss you|i love you|proud of you|i was hurt|i hate that|it really hurt)\b/i;
+  /\b(i'?m scared|i'?m anxious|i'?m struggling|i cried|i can'?t cope|i'?m not ok|i'?m not okay|i'?m exhausted|i'?m so tired|burnt? out|burning out|overwhelmed|can'?t sleep|i'?m stressed|so stressed|i'?m worried|i feel like|i felt|i don'?t know what to do|idk what to do|between us|don'?t tell|i'?ve never told|i need help|i'?m sorry for|i miss you|i love you|proud of you|i was hurt|i hate that|it really hurt)\b/i;
 
 const LOGISTICS =
   /\b(deadline|due|hand ?in|submit|assignment|homework|essay|coursework|marks|grading|exam|quiz|slides?|presentation|google (doc|drive)|spreadsheet|meeting|agenda|invoice|shift|roster|client|standup|sprint|ticket|pull request|deploy|the team|action items?)\b/i;

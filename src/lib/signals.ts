@@ -397,6 +397,10 @@ export function analyseThread(thread: Thread, owner: string, now = Date.now()): 
   const others = thread.participants.filter((p) => p !== owner);
   if (!others.length) return null;
 
+  // Every deleted account exports under the same placeholder, so this is not
+  // one friendship and cannot be ranked as one.
+  if (/^instagram user$/i.test(thread.name)) return null;
+
   const firstTs = messages[0].ts;
   const lastTs = messages[messages.length - 1].ts;
   const silenceDays = daysBetween(lastTs, now);

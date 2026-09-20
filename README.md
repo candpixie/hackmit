@@ -96,10 +96,34 @@ other's archives.
 
 ```bash
 pnpm install
-pnpm corpus     # generate the synthetic archive
-pnpm analyse    # prove the engine in a terminal, no keys needed
+pnpm corpus      # synthetic WhatsApp archive
+pnpm ig-corpus   # synthetic Instagram export
+pnpm analyse     # prove the engine in a terminal, no keys needed
 pnpm dev
 ```
+
+Then open the app and give it `data/corpus-instagram/inbox`, or click **Use the
+sample archive** for the WhatsApp one.
+
+### Demoing without anyone's real messages
+
+`pnpm ig-corpus` writes a synthetic Instagram export in the exact shape Meta
+produces, so the whole team can develop and demo without touching a real inbox.
+The cast is built so every path in the engine is visible:
+
+| Conversation | What it proves |
+|---|---|
+| **Mei Tanaka** | the flagship dormant tie: an unanswered question, a broken promise, a want, and a milestone nobody acknowledged |
+| **Rafa Ortiz** | still warm. Must **not** be flagged, which is what makes the ranking falsifiable |
+| **Priya Raman** | she carried it and you let it drop, so reciprocity scores low |
+| **Jonas Weber** | brief and intense, then two years of silence |
+| **cohort 2027** | the group the Friendsgiving planner runs on |
+| **crit group** | busy, and you never posted once. Must rank near zero |
+| **studio ops** | high volume, pure logistics. A colleague, not a friend |
+| **Instagram user** | a deleted account, which is filtered out rather than ranked as a person |
+
+It also plants reactions, shared reels and attachments in the markup, so the
+stripping in `src/lib/instagram.ts` is exercised rather than assumed.
 
 `pnpm analyse data/private` runs the same engine over your own exports.
 
