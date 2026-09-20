@@ -170,7 +170,7 @@ export function Landing({ onLoad, onLoadDir, busy, stage, error }: Props) {
                       Your activity → Download your information → HTML. Give it the
                       path to the <code>inbox</code> folder.
                     </p>
-                    <div className="mt-3 flex gap-2">
+                    <div className="mt-3 flex flex-wrap gap-2">
                       <input
                         value={dir}
                         onChange={(e) => setDir(e.target.value)}
@@ -178,7 +178,7 @@ export function Landing({ onLoad, onLoadDir, busy, stage, error }: Props) {
                           e.key === "Enter" && dir.trim() && onLoadDir(dir.trim())
                         }
                         spellCheck={false}
-                        className="min-w-0 flex-1 rounded border border-line bg-ink-soft px-3 py-2 font-mono text-[12px] text-bone"
+                        className="w-full min-w-0 flex-1 rounded border border-line bg-ink-soft px-3 py-2 font-mono text-[12px] text-bone sm:w-auto"
                       />
                       <button
                         onClick={() => dir.trim() && onLoadDir(dir.trim())}
