@@ -331,6 +331,7 @@ function decayScore(
   totalMessages: number,
   silenceDays: number,
   medianGapH: number,
+  yourShare: number,
   evidence: Evidence[]
 ): number {
   if (peakPerWeek === 0) return 0;
@@ -357,7 +358,13 @@ function decayScore(
   // Under three weeks is not dormant, whatever the arithmetic says.
   const dormant = silenceDays < 21 ? 0.15 : 1;
 
-  return value * silence * (0.65 + 0.35 * handle) * dormant;
+  // A busy group chat you never posted in is not a friendship going quiet, it
+  // is a room you left. Decay measures a relationship, so it needs you to have
+  // been in one.
+  const participation =
+    yourShare < 0.02 ? 0.05 : yourShare < 0.08 ? 0.3 : yourShare < 0.15 ? 0.7 : 1;
+
+  return value * silence * (0.65 + 0.35 * handle) * dormant * participation;
 }
 
 /**
@@ -437,7 +444,14 @@ export function analyseThread(thread: Thread, owner: string, now = Date.now()): 
     yourShare: Math.round((mine / messages.length) * 100) / 100,
     decay:
       Math.round(
-        decayScore(peak, messages.length, silenceDays, medianGapH, evidence) * 1000
+        decayScore(
+          peak,
+          messages.length,
+          silenceDays,
+          medianGapH,
+          mine / messages.length,
+          evidence
+        ) * 1000
       ) / 1000,
     evidence,
   };
@@ -453,6 +467,15 @@ export function analyse(threads: Thread[], owner: string, now = Date.now()): Tie
 /** One sentence a human can read without a legend. */
 export function headline(tie: Tie): string {
   const peak = Math.round(tie.peakPerWeek);
+
+  // In a group the cadence belongs to the room, not to you.
+  if (tie.isGroup) {
+    const yours = Math.round(tie.yourShare * 100);
+    return yours < 5
+      ? `${tie.totalMessages.toLocaleString()} messages you mostly watched. Quiet for ${tie.silenceDays} days.`
+      : `The group ran at ${peak}x a week. It's been ${tie.silenceDays} days.`;
+  }
+
   if (peak >= 7) {
     return `You used to talk ${peak}x a week. It's been ${tie.silenceDays} days.`;
   }

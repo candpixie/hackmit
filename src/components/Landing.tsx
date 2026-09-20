@@ -4,11 +4,13 @@ import { useRef, useState } from "react";
 
 type Props = {
   onLoad: (files: { name: string; text: string }[] | null) => void;
+  onLoadDir: (dir: string) => void;
   busy: boolean;
   error: string | null;
 };
 
-export function Landing({ onLoad, busy, error }: Props) {
+export function Landing({ onLoad, onLoadDir, busy, error }: Props) {
+  const [dir, setDir] = useState("");
   const input = useRef<HTMLInputElement>(null);
   const [over, setOver] = useState(false);
 
@@ -87,6 +89,30 @@ export function Landing({ onLoad, busy, error }: Props) {
             hidden
             onChange={(e) => void take(e.target.files)}
           />
+        </div>
+
+        <div className="mt-6 rounded-xl border border-line bg-ink-soft p-6">
+          <p className="text-[14px] text-bone">Or point it at an Instagram export</p>
+          <p className="mt-2 text-[13px] leading-relaxed text-faint">
+            Instagram → Your activity → Download your information → HTML. Give it the
+            path to the <code>inbox</code> folder.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <input
+              value={dir}
+              onChange={(e) => setDir(e.target.value)}
+              placeholder="~/Downloads/inbox"
+              spellCheck={false}
+              className="min-w-0 flex-1 rounded-md border border-line bg-card px-4 py-2.5 font-mono text-[13px] text-bone placeholder:text-faint"
+            />
+            <button
+              onClick={() => dir.trim() && onLoadDir(dir.trim())}
+              disabled={busy || !dir.trim()}
+              className="rounded-md border border-line px-5 py-2.5 text-[14px] text-muted transition-colors hover:border-ember hover:text-bone disabled:opacity-40"
+            >
+              Read it
+            </button>
+          </div>
         </div>
 
         {error ? (

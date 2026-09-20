@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "corpus": "node --experimental-strip-types scripts/make-corpus.ts",
-    "analyse": "node --experimental-strip-types scripts/analyse.ts"
+    "analyse": "node --experimental-strip-types scripts/analyse.ts",
+    "ig": "node --experimental-strip-types scripts/ingest-instagram.ts"
   },
   "dependencies": {
     "next": "^16.3.5",

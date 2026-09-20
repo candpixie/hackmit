@@ -120,9 +120,22 @@ The model client is OpenAI-compatible, so any compatible endpoint works.
 
 ## Getting your exports
 
-WhatsApp, open a chat, tap the contact name, **Export Chat**, **Without Media**.
-You get a `.txt`, or a `.zip` containing one. Drag it onto the page, or drop it
-in `data/private/`.
+**WhatsApp.** Open a chat, tap the contact name, **Export Chat**, **Without
+Media**. You get a `.txt`, or a `.zip` containing one. Drag it onto the page, or
+drop it in `data/private/`.
+
+**Instagram.** Your activity → Download your information → **HTML**. Give the
+page the path to the `inbox` folder, or run `pnpm ig ~/Downloads/inbox`.
+
+An Instagram export is four hundred folders of generated HTML, which is not
+something anyone selects in a file picker, so the app reads the directory
+directly. That path is refused outside development.
+
+The Instagram transcript needs more care than WhatsApp's. Messages are written
+newest first. Reactions live in a list appended to the message cell, so decoding
+a cell whole turns a question into `Are you feeling better?❤️Summer (Sep 24,
+2023 11:55 pm)`. Forwarded reels carry their captions into the transcript as if
+somebody had typed them. All three are stripped before anything is scored.
 
 The parser handles both iOS date formats and the Android format, works out
 whether the file is day-first or month-first from the file as a whole, folds
@@ -133,6 +146,7 @@ writes into message bodies.
 
 ```
 src/lib/parse.ts        WhatsApp export formats
+src/lib/instagram.ts    Instagram HTML export
 src/lib/signals.ts      decay scoring and the four evidence types
 src/lib/elastic.ts      indexing, cross-thread retrieval, aggregations
 src/app/api/analyse     parse, score, index

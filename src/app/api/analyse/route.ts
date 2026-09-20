@@ -1,11 +1,13 @@
 import { randomUUID } from "node:crypto";
-import { readdir, readFile } from "node:fs/promises";
+import { homedir } from "node:os";
+import { readdir, readFile, stat } from "node:fs/promises";
 import { basename, extname, join } from "node:path";
 import { NextResponse } from "next/server";
 import { inferOwner, parseChat, type Thread } from "@/lib/parse";
 import { analyse, classify, headline } from "@/lib/signals";
 import { elasticConfigured, indexMessages, type IndexedMessage } from "@/lib/elastic";
 import { remember } from "@/lib/session";
+import { parseInstagramHtml, threadNameFromFolder } from "@/lib/instagram";
 
 export const runtime = "nodejs";
 
@@ -18,10 +20,40 @@ function threadName(fileName: string): string {
     .trim();
 }
 
-async function build(uploads: Upload[]) {
-  const threads: Thread[] = uploads
-    .map((u) => parseChat(u.text, threadName(u.name)))
-    .filter((t) => t.messages.length > 0);
+/**
+ * An Instagram export is a directory of four hundred folders, which is not
+ * something anyone is going to select in a file picker. Reading it from disk
+ * is a local convenience and is refused outside development.
+ */
+async function readInstagramDir(dir: string): Promise<Thread[]> {
+  const entries = await readdir(dir, { withFileTypes: true });
+  const threads: Thread[] = [];
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+
+    const folder = join(dir, entry.name);
+    const files = (await readdir(folder)).filter((f) => /^message_\d+\.html$/.test(f));
+    if (!files.length) continue;
+
+    // Long conversations are split across message_1, message_2, and so on.
+    const merged = (
+      await Promise.all(files.sort().map((f) => readFile(join(folder, f), "utf8")))
+    ).join("\n");
+
+    const thread = parseInstagramHtml(merged, threadNameFromFolder(entry.name));
+    if (thread.messages.length) threads.push(thread);
+  }
+
+  return threads;
+}
+
+async function build(uploads: Upload[], preparsed?: Thread[]) {
+  const threads: Thread[] =
+    preparsed ??
+    uploads
+      .map((u) => parseChat(u.text, threadName(u.name)))
+      .filter((t) => t.messages.length > 0);
 
   if (!threads.length) {
     return { error: "No messages found. Export as .txt without media." };
@@ -67,7 +99,41 @@ async function build(uploads: Upload[]) {
 }
 
 export async function POST(req: Request) {
-  const { files } = (await req.json()) as { files?: Upload[] };
+  const body = (await req.json()) as { files?: Upload[]; localDir?: string };
+  const { files } = body;
+  let { localDir } = body;
+
+  if (localDir) {
+    // A path typed by a human starts with ~ about half the time.
+    localDir = localDir.startsWith("~")
+      ? join(homedir(), localDir.slice(1))
+      : localDir;
+
+    if (process.env.NODE_ENV === "production") {
+      return NextResponse.json(
+        { error: "Reading local directories is disabled outside development." },
+        { status: 403 }
+      );
+    }
+
+    try {
+      const info = await stat(localDir);
+      if (!info.isDirectory()) throw new Error("Not a directory.");
+    } catch {
+      return NextResponse.json({ error: `Cannot read ${localDir}.` }, { status: 400 });
+    }
+
+    const threads = await readInstagramDir(localDir);
+    if (!threads.length) {
+      return NextResponse.json(
+        { error: "No Instagram conversations found in that folder." },
+        { status: 400 }
+      );
+    }
+
+    const result = await build([], threads);
+    return NextResponse.json({ ...result, source: "instagram" });
+  }
 
   if (!files?.length) {
     return NextResponse.json({ error: "No files supplied." }, { status: 400 });

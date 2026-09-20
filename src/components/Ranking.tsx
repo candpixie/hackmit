@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { Report, TieView } from "@/lib/types";
 
 type Props = {
@@ -23,8 +24,13 @@ const TONE = {
   warm: "text-sage",
 } as const;
 
+const SHOWN = 20;
+
 export function Ranking({ report, selected, onSelect, onGroup, onReset }: Props) {
+  const [all, setAll] = useState(false);
   const dormant = report.ties.filter((t) => bucket(t) === "dormant").length;
+  // Four hundred rows is a scroll, not a list. Show the ones worth acting on.
+  const visible = all ? report.ties : report.ties.slice(0, SHOWN);
 
   return (
     <aside className="lg:sticky lg:top-12 lg:self-start">
@@ -45,9 +51,10 @@ export function Ranking({ report, selected, onSelect, onGroup, onReset }: Props)
       </h1>
 
       <p className="mt-3 text-[13px] leading-relaxed text-faint">
-        {report.messageCount.toLocaleString()} messages across {report.threadCount}{" "}
-        {report.threadCount === 1 ? "thread" : "threads"}, read as {report.owner}.
-        {report.sample ? " Sample archive." : ""}
+        {report.messageCount.toLocaleString()} messages across{" "}
+        {report.threadCount.toLocaleString()}{" "}
+        {report.threadCount === 1 ? "conversation" : "conversations"}, read as{" "}
+        {report.owner}.{report.sample ? " Sample archive." : ""}
       </p>
 
       <button
@@ -61,7 +68,7 @@ export function Ranking({ report, selected, onSelect, onGroup, onReset }: Props)
       </button>
 
       <ol className="mt-7 space-y-1">
-        {report.ties.map((tie, i) => {
+        {visible.map((tie, i) => {
           const active = selected?.thread === tie.thread;
           const tone = TONE[bucket(tie)];
 
@@ -104,6 +111,17 @@ export function Ranking({ report, selected, onSelect, onGroup, onReset }: Props)
           );
         })}
       </ol>
+
+      {report.ties.length > SHOWN ? (
+        <button
+          onClick={() => setAll((v) => !v)}
+          className="mt-5 w-full rounded-lg border border-line py-3 text-[13px] text-faint transition-colors hover:border-faint hover:text-bone"
+        >
+          {all
+            ? `Show the ${SHOWN} most overdue`
+            : `Show all ${report.ties.length.toLocaleString()} conversations`}
+        </button>
+      ) : null}
     </aside>
   );
 }

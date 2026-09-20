@@ -14,15 +14,15 @@ export default function Page() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(async (files: { name: string; text: string }[] | null) => {
+  const run = useCallback(async (body: object | null) => {
     setBusy(true);
     setError(null);
     try {
-      const res = files
+      const res = body
         ? await fetch("/api/analyse", {
             method: "POST",
             headers: { "content-type": "application/json" },
-            body: JSON.stringify({ files }),
+            body: JSON.stringify(body),
           })
         : await fetch("/api/analyse");
 
@@ -38,8 +38,15 @@ export default function Page() {
     }
   }, []);
 
+  const load = useCallback(
+    (files: { name: string; text: string }[] | null) => run(files ? { files } : null),
+    [run]
+  );
+
+  const loadDir = useCallback((localDir: string) => run({ localDir }), [run]);
+
   if (!report) {
-    return <Landing onLoad={load} busy={busy} error={error} />;
+    return <Landing onLoad={load} onLoadDir={loadDir} busy={busy} error={error} />;
   }
 
   if (group) {
