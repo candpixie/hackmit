@@ -10,6 +10,7 @@
 
 import { NextResponse } from "next/server";
 import { search, type Backend, type Hit } from "@/lib/search";
+import { recall } from "@/lib/session";
 import type { TieView } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -133,6 +134,16 @@ export async function POST(req: Request) {
 
   if (!session || !people?.length) {
     return NextResponse.json({ error: "Pick at least two friends." }, { status: 400 });
+  }
+
+  // Without this, an expired session falls through to an empty search and the
+  // response blames the friendships: "nothing in these threads says what
+  // anyone wanted to do". The archive was simply gone.
+  if (!recall(session)) {
+    return NextResponse.json(
+      { error: "That archive is no longer loaded. Load it again and retry." },
+      { status: 410 }
+    );
   }
 
   let hits: Hit[];
