@@ -74,10 +74,14 @@ person texting a friend.
 
 Both are grounded. Citations that do not point at a message we supplied are
 discarded before the response is returned, so the model cannot invent a memory.
+Muse holds that line on its own too: asked to plan for three friends it returned
+"only two of the three have shown interest in this, Theo has not mentioned
+exhibitions or pottery" rather than dressing the gap up.
 
 ## How the sponsors' pieces fit
 
-**Meta.** Muse Spark writes the drafts and does the group synthesis. The input is
+**Meta.** Muse Spark (`muse-spark-1.3`) writes the reconnection drafts, does the
+group synthesis, and captions the recap. The input is
 a Meta data export, parsed directly from Instagram's own HTML format. Three
 things in that format corrupt the signal if you ignore them, and we found all
 three the hard way: messages are written newest first; reactions live in a list

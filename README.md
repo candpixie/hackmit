@@ -132,7 +132,7 @@ and the group planner is the only feature that needs a cluster. To turn the rest
 on, copy `.env.example` to `.env.local`:
 
 ```bash
-META_API_KEY=            # Muse. Drafting and group synthesis.
+META_API_KEY=            # Muse Spark. `muse login` stores one in your keychain.
 LLM_BASE_URL=https://api.meta.ai/v1
 LLM_MODEL=muse-spark-1.3
 
