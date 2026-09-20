@@ -52,7 +52,9 @@ async function gather(
   people: string[]
 ): Promise<{ hits: Hit[]; backend: Backend }> {
   const results = await Promise.all(
-    PROBES.map((probe) => search(session, probe, { size: 12, excludeOwner: true }))
+    PROBES.map((probe) =>
+      search(session, probe, { size: 12, excludeOwner: true, threads: people })
+    )
   );
 
   const backend = results.find((r) => r.backend === "elasticsearch")

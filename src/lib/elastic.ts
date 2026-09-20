@@ -188,10 +188,15 @@ function toHits(res: any): Hit[] {
 export async function searchAll(
   session: string,
   query: string,
-  opts: { size?: number; excludeOwner?: boolean } = {}
+  opts: { size?: number; excludeOwner?: boolean; threads?: string[] } = {}
 ): Promise<Hit[]> {
   const filter: any[] = [{ term: { session } }];
   if (opts.excludeOwner) filter.push({ term: { isOwner: false } });
+
+  // Restricting to the chosen people has to happen in the query. Filtering
+  // afterwards throws away almost everything, because the global top results
+  // across four hundred conversations are rarely from the four you picked.
+  if (opts.threads?.length) filter.push({ terms: { thread: opts.threads } });
 
   const res = await es(`/${INDEX}/_search`, {
     method: "POST",

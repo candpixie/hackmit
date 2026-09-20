@@ -124,7 +124,7 @@ export type SearchResult = { hits: Hit[]; backend: Backend };
 export async function search(
   session: string,
   query: string,
-  opts: { size?: number; excludeOwner?: boolean } = {}
+  opts: { size?: number; excludeOwner?: boolean; threads?: string[] } = {}
 ): Promise<SearchResult> {
   const size = opts.size ?? 20;
 
@@ -137,8 +137,12 @@ export async function search(
     }
   }
 
-  const docs = corpusFor(session, opts.excludeOwner ?? false);
-  if (!docs) return { hits: [], backend: "in-memory" };
+  const all = corpusFor(session, opts.excludeOwner ?? false);
+  if (!all) return { hits: [], backend: "in-memory" };
+
+  const docs = opts.threads?.length
+    ? all.filter((d) => opts.threads!.includes(d.hit.thread))
+    : all;
 
   return { hits: bm25(docs, query, size), backend: "in-memory" };
 }
