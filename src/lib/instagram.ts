@@ -89,9 +89,12 @@ function extractText(cell: string): string {
  * Instagram is reacting to things.
  */
 const NOT_SPEECH = [
-  /^liked a message$/i,
-  /^reacted .* to your message$/i,
+  // The export writes these with the username in front: "sydn.e liked a
+  // message". Anchoring on the phrase alone let every one of them through.
+  /^\S{0,40}\s*liked a message$/i,
+  /\breacted\b.*\bto your message$/i,
   /^[^ ]* to your message$/i,
+  /^\S{0,40}\s*(unsent|removed) a message$/i,
   /^(sent|shared) an? (attachment|photo|video|voice message|story|reel|post)/i,
   /^you (sent|shared)/i,
   /^this message (is no longer available|was unsent)/i,

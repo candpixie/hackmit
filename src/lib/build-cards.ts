@@ -267,17 +267,6 @@ function memoryLane(threads: Thread[], owner: string, ties: Tie[]): Card[] {
 const SUBJECT =
   /\b(pottery|ceramics|climb\w*|bouldering|hike|hiking|camping|surf\w*|ski|snowboard|pilates|yoga|marathon|tattoo|piano|guitar|drums|paint\w*|draw\w*|knit\w*|bake|baking|cooking|pasta|sushi|ramen|korea|japan|tokyo|seoul|paris|iceland|roadtrip|road trip|concert|festival|museum|exhibition|therapy|driving|license)\b/i;
 
-/**
- * A topic the two of you used to share and stopped talking about.
- *
- * Not a plan and not a question: a subject that ran through the conversation
- * for a while and then went quiet, which is the thing you can pick back up
- * without apologising for anything first.
- *
- * The bar is deliberately high. It must have come up at least three times, on
- * at least three different days, by both of you, and the last time must be a
- * long while ago. Two mentions is a coincidence; one-sided is a monologue.
- */
 /** Topics an unfinished-plans card already shows, so nothing is found twice. */
 function plannedSubjects(plans: Card[]): Set<string> {
   const out = new Set<string>();
@@ -290,16 +279,42 @@ function plannedSubjects(plans: Card[]): Set<string> {
   return out;
 }
 
+/** Oldest, the other person's voice, then the last time it came up. */
 function pick3(days: Message[], owner: string): Message[] {
   const first = days[0];
   const last = days[days.length - 1];
-  const middle = days
-    .slice(1, -1)
-    .find((m) => (m.sender === owner) !== (first.sender === owner)) ?? days[Math.floor(days.length / 2)];
+  const middle =
+    days.slice(1, -1).find((m) => (m.sender === owner) !== (first.sender === owner)) ??
+    days[Math.floor(days.length / 2)];
   return [first, middle, last];
 }
 
-function reconnect(threads: Thread[], owner: string, now: number, taken: Set<string>): Card[] {
+/**
+ * A topic the two of you used to share and stopped talking about.
+ *
+ * Not a plan and not a question: a subject that ran through the conversation
+ * for a while and then went quiet, which is the thing you can pick back up
+ * without apologising for anything first.
+ *
+ * The subject has to come from the closed list above, and that is a real
+ * limit worth stating. A general version was tried: take any word that is
+ * rare across the archive and recurrent inside one chat. On a real archive it
+ * returned people's names, "waiting", "thinking" and "weirdo", because
+ * distinguishing a topic from a verb needs to parse the sentence, not count
+ * the words. A card that says "you used to talk about weirdo" costs more
+ * trust than the card was ever going to earn. So this finds less, and what it
+ * finds is right.
+ *
+ * The rest of the bar: at least three separate days, both of you in it, and
+ * silent for six months. Two mentions is a coincidence, one-sided is a
+ * monologue.
+ */
+function reconnect(
+  threads: Thread[],
+  owner: string,
+  now: number,
+  taken: Set<string>
+): Card[] {
   const QUIET = 180 * 86_400_000;
   const cards: Card[] = [];
 
@@ -309,19 +324,17 @@ function reconnect(threads: Thread[], owner: string, now: number, taken: Set<str
     for (const m of thread.messages) {
       const subject = m.text.toLowerCase().match(SUBJECT)?.[0];
       if (!subject) continue;
-      const list = bySubject.get(subject) ?? [];
-      list.push(m);
-      bySubject.set(subject, list);
+      bySubject.set(subject, [...(bySubject.get(subject) ?? []), m]);
     }
 
     let best: { subject: string; days: Message[] } | null = null;
 
     for (const [subject, raw] of bySubject) {
-      const mentions = [...raw].sort((a, b) => a.ts - b.ts);
+      if (taken.has(`${thread.name}::${subject}`)) continue;
 
       // One a day at most, so a single excited evening is not a running theme.
       const days: Message[] = [];
-      for (const m of mentions) {
+      for (const m of [...raw].sort((a, b) => a.ts - b.ts)) {
         const last = days[days.length - 1];
         if (!last || new Date(m.ts).toDateString() !== new Date(last.ts).toDateString()) {
           days.push(m);
@@ -336,10 +349,6 @@ function reconnect(threads: Thread[], owner: string, now: number, taken: Set<str
       // And it has to have actually stopped.
       if (now - days[days.length - 1].ts < QUIET) continue;
 
-      // If the plans card already shows this exact topic in this exact chat,
-      // it is one finding, not two.
-      if (taken.has(`${thread.name}::${subject}`)) continue;
-
       if (!best || days.length > best.days.length) best = { subject, days };
     }
 
@@ -349,11 +358,6 @@ function reconnect(threads: Thread[], owner: string, now: number, taken: Set<str
     const last = best.days[best.days.length - 1];
     const daysSince = Math.round((now - last.ts) / 86_400_000);
 
-    // Oldest, middle, newest: the shape of a topic fading out.
-    // Oldest, then the other person's voice, then the last time it came up:
-    // the shape of a topic fading out, with both of you visibly in it.
-    const shown = best.days.length <= 3 ? best.days : pick3(best.days, owner);
-
     cards.push({
       id: id("reconnect", thread.name, best.subject),
       kind: "reconnect",
@@ -361,12 +365,16 @@ function reconnect(threads: Thread[], owner: string, now: number, taken: Set<str
       rank: null,
       friend: { name: friend, threadId: thread.name },
       title: `You used to talk about ${best.subject}.`,
-      body: `It came up ${best.days.length} times between you, and then it stopped. Neither of you has mentioned it since ${monthYear(last.ts)}, ${ago(daysSince)}.`,
+      body: `It came up on ${best.days.length} separate days between you, and then it stopped. Neither of you has mentioned it since ${monthYear(
+        last.ts
+      )}, ${ago(daysSince)}.`,
       stats: [
-        { label: "Times mentioned", value: `${best.days.length}` },
+        { label: "Days mentioned", value: `${best.days.length}` },
         { label: "Last mentioned", value: monthYear(last.ts) },
       ],
-      evidence: shown.map((m) => ev(m, owner, thread.name, true)),
+      evidence: (best.days.length <= 3 ? best.days : pick3(best.days, owner)).map((m) =>
+        ev(m, owner, thread.name, true)
+      ),
       action: {
         label: "Reconnect",
         draft: `random question but are you still doing the ${best.subject} thing? it came up and i realised i have no idea where you landed with it`,
