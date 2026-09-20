@@ -100,12 +100,18 @@ for (const thread of threads) {
       if (answer) break;
     }
 
-    console.log(`  you sent ${spoke} messages in the 14 days after this`);
-    console.log(
-      answer
-        ? `  \x1b[32mANSWERED\x1b[0m by "${answer.text.slice(0, 80)}"`
-        : `  \x1b[31mNEVER ANSWERED\x1b[0m — none of those ${spoke} shared a single content word`
-    );
+    // Two different failures, and only one of them is the interesting one.
+    if (answer) {
+      console.log(`  you sent ${spoke} messages in the 14 days after this`);
+      console.log(`  \x1b[32mANSWERED\x1b[0m by "${answer.text.slice(0, 80)}"`);
+    } else if (spoke === 0) {
+      console.log(`  \x1b[31mNEVER REPLIED\x1b[0m — you did not send anything for 14 days after this`);
+    } else {
+      console.log(`  you sent ${spoke} messages in the 14 days after this`);
+      console.log(
+        `  \x1b[31mNEVER ANSWERED\x1b[0m — not one of those ${spoke} contained any of: ${[...asked].join(", ")}`
+      );
+    }
   }
 }
 
