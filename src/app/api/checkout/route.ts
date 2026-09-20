@@ -115,10 +115,20 @@ export async function POST(req: Request) {
   if (perPerson > cap) {
     const optional = items.findIndex((i) => i.note?.includes("optional"));
     if (optional >= 0) {
-      adjustment = `Dropped ${items[optional].label} to stay under ${currency ?? "$"}${cap} each.`;
+      const dropped = items[optional].label;
       items = items.filter((_, i) => i !== optional);
       subtotal = items.reduce((n, i) => n + i.amount, 0);
       perPerson = subtotal / headcount;
+
+      // Only claim the cap was met once it actually is. Saying "dropped X to
+      // stay under $20" while the total is $22 is the agent reporting a
+      // success it did not achieve, which is the one thing it must not do.
+      adjustment =
+        perPerson <= cap
+          ? `Dropped ${dropped} to stay under ${currency ?? "$"}${cap} each.`
+          : `Dropped ${dropped}. Still ${currency ?? "$"}${(perPerson - cap).toFixed(
+              2
+            )} over the ${currency ?? "$"}${cap} cap.`;
       reasoning.push(adjustment);
     }
   }
