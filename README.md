@@ -70,26 +70,6 @@ expect to work as well as it did.
 - **Roman Stashkiv** — visual direction and the Wrapped deck the desktop
   surface is built from.
 
-## How the sponsors' pieces fit
-
-**Meta.** Muse Spark (`muse-spark-1.3`) writes the reconnection drafts, does the
-group synthesis, and captions the recap. The input is a Meta data export,
-parsed from Instagram's own HTML. Citations that do not point at a supplied
-message are discarded before the response returns, so the model cannot invent a
-memory.
-
-**Elastic.** One archive fits in a loop. Four hundred do not. Every message is
-indexed with the engine's own classification flags, which turns the question and
-commitment patterns into filters instead of scans, and answers the cross-thread
-question the planner needs: who has ever mentioned wanting this. It also makes
-sessions durable, since the archive can be read back from the index.
-
-**Visa.** Scoped-credential agent commerce: one merchant, one amount, one
-thirty minute window, and the human sees the cart and the reasoning before
-anything moves. When the total exceeds the cap the agent changes the order and
-says which line it dropped. Sandbox throughout and labelled as such.
-
-
 ## How it works
 
 ```
@@ -145,6 +125,26 @@ response returns.
 
 Everyone builds "you stopped replying". This is the other thing, and it is the
 one nobody finds by scrolling.
+
+## How the sponsors' pieces fit
+
+**Meta.** Muse Spark (`muse-spark-1.3`) writes the reconnection drafts, does the
+group synthesis, and captions the recap. The input is a Meta data export,
+parsed from Instagram's own HTML. Citations that do not point at a supplied
+message are discarded before the response returns, so the model cannot invent a
+memory.
+
+**Elastic.** One archive fits in a loop. Four hundred do not. Every message is
+indexed with the engine's own classification flags, which turns the question and
+commitment patterns into filters instead of scans, and answers the cross-thread
+question the planner needs: who has ever mentioned wanting this. It also makes
+sessions durable, since the archive can be read back from the index.
+
+**Visa.** Scoped-credential agent commerce: one merchant, one amount, one
+thirty minute window, and the human sees the cart and the reasoning before
+anything moves. When the total exceeds the cap the agent changes the order and
+says which line it dropped. Sandbox throughout and labelled as such.
+
 
 ## Using it after the demo
 
