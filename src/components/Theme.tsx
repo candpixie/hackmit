@@ -4,12 +4,17 @@
 
 import { useEffect, useState } from "react";
 
-const KEY = "overdue.theme";
+// Versioned: the default flipped from paper to dark, and anyone who had used
+// the site before was pinned to their old saved choice.
+const KEY = "overdue.theme.v2";
 
 export function ThemeToggle() {
   const [paper, setPaper] = useState(false);
 
   useEffect(() => {
+    try {
+      localStorage.removeItem("overdue.theme");
+    } catch {}
     const saved = localStorage.getItem(KEY) === "paper";
     setPaper(saved);
     document.documentElement.dataset.theme = saved ? "paper" : "dark";
