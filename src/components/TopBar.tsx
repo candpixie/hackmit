@@ -18,6 +18,7 @@ const TABS = [
   { href: "/book", label: "Read", hint: "The archive as a book" },
   { href: "/wrapped", label: "Wrapped", hint: "Your year in DMs" },
   { href: "/insights", label: "Cards", hint: "Everything as a list" },
+  { href: "/dm", label: "DM", hint: "The DM-style view" },
 ];
 
 export function TopBar() {
