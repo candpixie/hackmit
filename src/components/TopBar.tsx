@@ -26,12 +26,20 @@ export function TopBar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-ink/85 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-6 px-6">
-        <a href="/" className="shrink-0 font-serif text-[20px] leading-none text-bone">
+      <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-3 px-4 sm:gap-6 sm:px-6">
+        <a
+          href="/"
+          className="shrink-0 font-serif text-[17px] leading-none text-bone sm:text-[20px]"
+        >
           Insta Insights
         </a>
 
-        <nav aria-label="Surfaces" className="flex min-w-0 flex-1 items-center gap-1">
+        {/* The four tabs plus the wordmark do not fit on a small phone, so the
+            tab strip scrolls rather than pushing the page wider. */}
+        <nav
+          aria-label="Surfaces"
+          className="-mx-1 flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto px-1 [scrollbar-width:none] sm:gap-1 [&::-webkit-scrollbar]:hidden"
+        >
           {TABS.map((t) => {
             const active = path === t.href;
             return (
@@ -40,13 +48,13 @@ export function TopBar() {
                 href={t.href}
                 title={t.hint}
                 aria-current={active ? "page" : undefined}
-                className={`relative rounded-md px-3 py-1.5 text-[13px] transition-colors ${
+                className={`relative shrink-0 rounded-md px-2 py-1.5 text-[13px] transition-colors sm:px-3 ${
                   active ? "text-bone" : "text-faint hover:text-muted"
                 }`}
               >
                 {t.label}
                 {active ? (
-                  <span className="absolute inset-x-3 -bottom-[11px] h-[2px] rounded-full bg-ember" />
+                  <span className="absolute inset-x-2 -bottom-[11px] h-[2px] rounded-full bg-ember sm:inset-x-3" />
                 ) : null}
               </a>
             );
