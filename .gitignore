@@ -14,3 +14,16 @@ node_modules
 /insights.json
 /*.cards.json
 /*.insights.json
+
+# From the Python implementation
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+.DS_Store
+# Real Instagram exports. Never committed.
+# Generated output
+# Mockup screenshots (regenerable)
+/mockups/shots/
+# Leftover build output from an earlier frontend experiment
+/web/
