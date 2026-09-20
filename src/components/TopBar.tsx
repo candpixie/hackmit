@@ -19,6 +19,7 @@ const TABS = [
   { href: "/wrapped", label: "Wrapped", hint: "Your year in DMs" },
   { href: "/insights", label: "Cards", hint: "Everything as a list" },
   { href: "/dm", label: "DM", hint: "The DM-style view" },
+  { href: "/status", label: "Status", hint: "Live check of every integration" },
 ];
 
 export function TopBar() {

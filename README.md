@@ -89,6 +89,83 @@ thirty minute window, and the human sees the cart and the reasoning before
 anything moves. When the total exceeds the cap the agent changes the order and
 says which line it dropped. Sandbox throughout and labelled as such.
 
+
+## How it works
+
+```
+   your export                  the engine                    what you read
+ ┌──────────────┐         ┌───────────────────┐         ┌──────────────────┐
+ │  Instagram   │         │  parse            │         │  Find    act     │
+ │  HTML  or    │ ──────▶ │  score            │ ──────▶ │  Read    book    │
+ │  WhatsApp    │         │  index            │         │  Wrapped share   │
+ │  .txt        │         │  narrate          │         │  Cards   list    │
+ └──────────────┘         └───────────────────┘         │  DM      review  │
+   on your machine          arithmetic finds,            └──────────────────┘
+   never uploaded           the model writes               one card feed
+```
+
+Every surface renders the same JSON. That is why they agree with each other.
+
+### Where each sponsor sits
+
+```
+  messages ──▶ parse ──▶ signals ──▶ ELASTIC index
+                            │             │
+                            │             ├──▶ cross-thread search
+                            │             └──▶ session survives restart
+                            ▼
+                         evidence
+                            │
+                            ├──▶ MUSE  draft the message
+                            ├──▶ MUSE  synthesise a group plan
+                            └──▶ VISA  scoped checkout, spend cap
+```
+
+**Arithmetic finds. The model writes. Neither does the other's job.** The signals
+are counted from timestamps, message lengths and phrasing, so every claim can
+point at a message. Muse is handed only the handful of messages it is allowed
+to talk about, and any citation that does not match one is dropped before the
+response returns.
+
+### The one detection worth explaining
+
+```
+  Mei:  "how did the showcase go?? you never told me"        ← the question
+         │
+         │   the next 14 days
+         ▼
+  you:  387 messages                                          ← you kept talking
+         │
+         ▼
+  none contain: showcase, interview, offer                    ← none about it
+         │
+         ▼
+  UNANSWERED                                                  ← not "you ghosted"
+```
+
+Everyone builds "you stopped replying". This is the other thing, and it is the
+one nobody finds by scrolling.
+
+## Using it after the demo
+
+The app is the fast path. Underneath, everything is a command, so the analysis
+can go wherever you want it.
+
+```bash
+pnpm ig       ~/Downloads/inbox              # the ranking, in a terminal
+pnpm cards    ~/Downloads/inbox cards.json   # the card feed as JSON
+pnpm insights ~/Downloads/inbox out.json     # the whole analysis as JSON
+pnpm verify   ~/Downloads/inbox "<quote>"    # trace one claim to the source
+pnpm check-elastic                           # is the cluster reachable
+```
+
+`cards.json` is the display contract, so anything that can render a list can
+render your archive. Two frontends in this repo already do.
+
+Visit **/status** at any time for a live check of all three integrations: it
+asks Muse which models it serves, asks the cluster how many documents it holds,
+and hands the checkout a cart it cannot afford to confirm it refuses.
+
 ## Demoing each track
 
 Two minutes each, on the live site or locally. Load the sample archive first;
