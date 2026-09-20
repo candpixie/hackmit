@@ -139,8 +139,8 @@ export default function BookPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6 py-10">
       <div
-        className="book-stack relative w-full max-w-[1180px]"
-        style={{ perspective: "2600px", aspectRatio: "16 / 10" }}
+        className="book-stack relative w-full max-w-[1180px] aspect-[3/4] sm:aspect-[4/3] lg:aspect-[16/10]"
+        style={{ perspective: "2600px" }}
         onPointerDown={(e) => (drag.current = e.clientX)}
         onPointerUp={(e) => {
           if (drag.current === null) return;
@@ -179,8 +179,11 @@ export default function BookPage() {
         >
           ← Back
         </button>
-        <p className="font-mono text-[10px] tracking-[0.18em] text-faint">
+        <p className="hidden font-mono text-[10px] tracking-[0.18em] text-faint sm:block">
           {i + 1} / {pages.length} · arrows, drag, or click the edge
+        </p>
+        <p className="font-mono text-[10px] tabular-nums tracking-[0.18em] text-faint sm:hidden">
+          {i + 1} / {pages.length}
         </p>
         <button
           onClick={() => go(1)}
@@ -207,7 +210,7 @@ function Verso({ n }: { n: number }) {
 
 function PageBody({ page, n, total }: { page: Page; n: number; total: number }) {
   return (
-    <div className="relative h-full pl-24 pr-14 py-12">
+    <div className="relative h-full overflow-y-auto px-6 py-8 sm:pl-16 sm:pr-10 lg:pl-24 lg:pr-14 lg:py-12">
       {page.type === "cover" ? <Cover env={page.env} /> : null}
       {page.type === "chapter" ? <Chapter page={page} /> : null}
       {page.type === "card" ? <CardSpread card={page.card} /> : null}
@@ -238,7 +241,7 @@ function Cover({ env }: { env: Envelope }) {
       </p>
 
       <div>
-        <h1 className="font-serif text-[120px] leading-[0.82] tracking-tight text-bone">
+        <h1 className="font-serif text-[64px] leading-[0.85] tracking-tight text-bone sm:text-[88px] lg:text-[120px] lg:leading-[0.82]">
           Over
           <br />
           due
@@ -266,7 +269,7 @@ function Chapter({ page }: { page: Extract<Page, { type: "chapter" }> }) {
   return (
     <div className="flex h-full flex-col justify-center">
       <p className="font-serif text-[22px] text-ember">{page.roman}</p>
-      <h2 className="mt-5 max-w-2xl font-serif text-[68px] leading-[0.95] tracking-tight text-bone">
+      <h2 className="mt-5 max-w-2xl font-serif text-[40px] leading-[1] tracking-tight text-bone sm:text-[52px] lg:text-[68px] lg:leading-[0.95]">
         {page.label}
       </h2>
       <p className="mt-7 font-mono text-[11px] uppercase tracking-[0.2em] text-faint">
@@ -281,7 +284,7 @@ function CardSpread({ card }: { card: Card }) {
   const [copied, setCopied] = useState(false);
 
   return (
-    <div className="grid h-full grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] gap-14">
+    <div className="grid h-full gap-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] lg:gap-14">
       {/* recto: the claim */}
       <div className="flex flex-col justify-center">
         <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ember">
@@ -289,7 +292,7 @@ function CardSpread({ card }: { card: Card }) {
           {card.rank ? ` · no. ${card.rank}` : ""}
         </p>
 
-        <h2 className="mt-5 font-serif text-[40px] leading-[1.02] tracking-tight text-bone">
+        <h2 className="mt-5 font-serif text-[28px] leading-[1.06] tracking-tight text-bone sm:text-[34px] lg:text-[40px] lg:leading-[1.02]">
           {card.title}
         </h2>
 
@@ -333,7 +336,7 @@ function CardSpread({ card }: { card: Card }) {
       </div>
 
       {/* verso: the proof */}
-      <div className="flex flex-col justify-center overflow-hidden">
+      <div className="flex flex-col justify-center lg:overflow-hidden">
         {card.evidence.length ? (
           <>
             <p className="mb-5 font-mono text-[9px] uppercase tracking-[0.22em] text-faint">
@@ -403,7 +406,7 @@ function End({ env }: { env: Envelope }) {
       <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-faint">
         The end of the archive
       </p>
-      <h2 className="mt-8 max-w-2xl font-serif text-[56px] leading-[0.98] tracking-tight text-bone">
+      <h2 className="mt-8 max-w-2xl font-serif text-[36px] leading-[1.02] tracking-tight text-bone sm:text-[46px] lg:text-[56px] lg:leading-[0.98]">
         None of them need a paragraph.
       </h2>
       <p className="mt-7 max-w-lg text-[16px] leading-relaxed text-muted">
