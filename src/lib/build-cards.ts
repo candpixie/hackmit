@@ -12,7 +12,7 @@
 
 import { createHash } from "node:crypto";
 import type { Message, Thread } from "./parse.ts";
-import { analyse, type Tie } from "./signals.ts";
+import { analyse, contentWords, type Tie } from "./signals.ts";
 import { closeness, closenessHeadline } from "./closeness.ts";
 import { highlights } from "./recap.ts";
 import { wrappedStats } from "./wrapped.ts";
@@ -265,7 +265,7 @@ function memoryLane(threads: Thread[], owner: string, ties: Tie[]): Card[] {
  * common noun into a "shared interest" and the cards stop meaning anything.
  */
 const SUBJECT =
-  /\b(pottery|ceramics|climb\w*|bouldering|hike|hiking|camping|surf\w*|ski|snowboard|pilates|yoga|marathon|tattoo|piano|guitar|drums|paint\w*|draw\w*|knit\w*|bake|baking|cook\w*|pasta|sushi|ramen|korea|japan|tokyo|seoul|paris|iceland|roadtrip|road trip|concert|festival|museum|exhibition|therapy|driving|license)\b/i;
+  /\b(pottery|ceramics|climb\w*|bouldering|hike|hiking|camping|surf\w*|ski|snowboard|pilates|yoga|marathon|tattoo|piano|guitar|drums|paint\w*|draw\w*|knit\w*|bake|baking|cooking|pasta|sushi|ramen|korea|japan|tokyo|seoul|paris|iceland|roadtrip|road trip|concert|festival|museum|exhibition|therapy|driving|license)\b/i;
 
 /**
  * A topic the two of you used to share and stopped talking about.
@@ -382,28 +382,61 @@ function reconnect(threads: Thread[], owner: string, now: number, taken: Set<str
  * chats. This is the card that needs the whole archive at once: the two halves
  * are in different conversations, so no single thread contains the finding.
  */
+/** The wish itself: up to the end of the sentence, and no further. */
+function clause(rest: string): string {
+  const stop = rest.search(/[.!?;\n]|\band\b|\bbut\b|\bcuz\b|\bbecause\b/i);
+  return (stop > 0 ? rest.slice(0, stop) : rest).split(/\s+/).slice(0, 12).join(" ");
+}
+
+/** How much two wishes are actually about the same thing. */
+function shareWords(a: Set<string>, b: Set<string>): number {
+  let n = 0;
+  for (const w of a) if (b.has(w)) n++;
+  return n;
+}
+
 function bothWanted(threads: Thread[], owner: string): Card[] {
   /** "to Priya" reads wrong for a group chat, "in crit group" for a person. */
   const where = (w: { thread: string; oneToOne: boolean }) =>
     w.oneToOne ? `to ${firstName(w.thread)}` : `in ${w.thread}`;
 
   const WANT =
-    /\b(i'?ve always wanted|i'?ve been wanting|i really want|dying to|i wish i could|i want to try|i'?d love to)\b/i;
+    /\b(i'?ve always wanted|i'?ve been wanting|i really want|i'?m dying to|dying to|i wish i could|i want to try|i'?d love to|i'?m interested in|i really wanna)\b/i;
 
-  type Wish = { m: Message; thread: string; subject: string; oneToOne: boolean };
+  /**
+   * "i'd love to come see you" is an acceptance, not a wish. So is "i'd love
+   * to help". They are the most common shape this phrase takes in real chats
+   * and pairing on them produces nonsense.
+   */
+  const REPLY = /\b(to|and)?\s*(come|join|help|meet|see|visit|talk|chat|hear|work)\s+(you|u|with|too|there|again|back|out)\b/i;
+
+  type Wish = { m: Message; thread: string; words: Set<string>; oneToOne: boolean };
 
   const mine: Wish[] = [];
   const theirs: Wish[] = [];
 
   for (const thread of threads) {
     for (const m of thread.messages) {
-      if (!WANT.test(m.text)) continue;
-      const subject = m.text.toLowerCase().match(SUBJECT)?.[0];
-      if (!subject) continue;
+      const hit = m.text.match(WANT);
+      if (!hit || hit.index === undefined) continue;
+
+      // Only the clause after the phrase. Taking the whole rest of a long
+      // message lets two unrelated paragraphs share words by accident, which
+      // is how "watch it for the first time" paired with "get my academics
+      // done first". A wish says what it is about immediately.
+      const object = clause(m.text.slice(hit.index + hit[0].length));
+      if (REPLY.test(object)) continue;
+
+      // A wish needs something to be about. "IVE ALWAYS WANTED TO TRY" and
+      // "i wish i could lmfao" are reflexes, and there are far more of them
+      // in a real archive than there are real wishes.
+      const words = contentWords(object);
+      if (words.size < 1) continue;
+
       (m.sender === owner ? mine : theirs).push({
         m,
         thread: thread.name,
-        subject,
+        words,
         oneToOne: thread.participants.length <= 2,
       });
     }
@@ -413,10 +446,16 @@ function bothWanted(threads: Thread[], owner: string): Card[] {
   const used = new Set<string>();
 
   for (const wish of theirs) {
-    const match = mine.find((w) => w.subject === wish.subject);
+    // Said in a different conversation, or it is not a discovery: if it was
+    // the same chat then you both already know.
+    const match = mine.find(
+      (w) => w.thread !== wish.thread && shareWords(w.words, wish.words) >= 2
+    );
     if (!match) continue;
-    if (used.has(wish.subject)) continue;
-    used.add(wish.subject);
+
+    const shared = [...wish.words].filter((w) => match.words.has(w)).sort().join("+");
+    if (used.has(shared)) continue;
+    used.add(shared);
 
     cards.push({
       id: id("both_wanted", wish.m.id, match.m.id),
@@ -424,10 +463,13 @@ function bothWanted(threads: Thread[], owner: string): Card[] {
       score: 0.82,
       rank: null,
       friend: { name: wish.m.sender, threadId: wish.thread },
-      // The subject word is whatever the sentence used ("cook", "japan"), so
-      // never bend a sentence around it. The quotes say what it was.
+      // The shared word is whatever the two sentences happened to use, so
+      // never bend a title around it. The quotes say what it was.
       title: `You both wanted this. Separately.`,
-      body: `${firstName(wish.m.sender)} said it ${where(wish)}. You said the same thing ${where(match)}, months apart. Neither of you ever put the two together.`,
+      body: `${firstName(wish.m.sender)} said it ${
+        // "Jonas said it to Jonas" is nonsense: his 1:1 is just "this chat".
+        wish.oneToOne ? "in this chat" : `in ${wish.thread}`
+      }. You said the same thing ${where(match)}, months apart. Neither of you ever put the two together.`,
       stats: [],
       // Oldest first, and each from its own chat.
       evidence: [wish, match]

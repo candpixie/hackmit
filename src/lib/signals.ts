@@ -213,6 +213,8 @@ function contentWords(text: string): Set<string> {
   );
 }
 
+export { contentWords };
+
 function overlaps(a: Set<string>, b: Set<string>): boolean {
   for (const w of a) if (b.has(w)) return true;
   return false;
