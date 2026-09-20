@@ -120,7 +120,14 @@ export async function POST(req: Request) {
       const info = await stat(localDir);
       if (!info.isDirectory()) throw new Error("Not a directory.");
     } catch {
-      return NextResponse.json({ error: `Cannot read ${localDir}.` }, { status: 400 });
+      // A mistyped path is the most likely failure here, so say what we looked
+      // for rather than only that it was not there.
+      return NextResponse.json(
+        {
+          error: `Cannot read ${localDir}. Expected a folder of Instagram conversation directories, usually ~/Downloads/inbox.`,
+        },
+        { status: 400 }
+      );
     }
 
     const threads = await readInstagramDir(localDir);

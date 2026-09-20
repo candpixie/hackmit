@@ -10,7 +10,8 @@ type Props = {
 };
 
 export function Landing({ onLoad, onLoadDir, busy, error }: Props) {
-  const [dir, setDir] = useState("");
+  // Prefilled: nobody should be typing a path correctly during a demo.
+  const [dir, setDir] = useState("~/Downloads/inbox");
   const input = useRef<HTMLInputElement>(null);
   const [over, setOver] = useState(false);
 
