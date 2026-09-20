@@ -1,6 +1,9 @@
 import type { Evidence, Tie } from "./signals";
+import type { Closeness, Factor } from "./closeness";
 
-export type { Evidence, Tie };
+export type { Evidence, Tie, Closeness, Factor };
+
+export type CloseView = Closeness & { headline: string };
 
 export type TieView = Tie & { headline: string };
 
@@ -10,6 +13,7 @@ export type Report = {
   threadCount: number;
   messageCount: number;
   ties: TieView[];
+  closest: CloseView[];
   sample?: boolean;
   search?: { enabled: boolean; indexed: number; error: string | null };
 };

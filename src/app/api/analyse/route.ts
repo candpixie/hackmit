@@ -5,6 +5,7 @@ import { basename, extname, join } from "node:path";
 import { NextResponse } from "next/server";
 import { inferOwner, parseChat, type Thread } from "@/lib/parse";
 import { analyse, classify, headline } from "@/lib/signals";
+import { closeness, closenessHeadline } from "@/lib/closeness";
 import { elasticConfigured, indexMessages, type IndexedMessage } from "@/lib/elastic";
 import { remember } from "@/lib/session";
 import { parseInstagramHtml, threadNameFromFolder } from "@/lib/instagram";
@@ -62,6 +63,11 @@ async function build(uploads: Upload[], preparsed?: Thread[]) {
   const owner = inferOwner(threads);
   const ties = analyse(threads, owner).map((t) => ({ ...t, headline: headline(t) }));
 
+  const close = closeness(threads, owner).map((c) => ({
+    ...c,
+    headline: closenessHeadline(c),
+  }));
+
   const session = randomUUID();
 
   // The recap needs the messages themselves, not just what we derived from them.
@@ -94,6 +100,7 @@ async function build(uploads: Upload[], preparsed?: Thread[]) {
     threadCount: threads.length,
     messageCount: threads.reduce((n, t) => n + t.messages.length, 0),
     ties,
+    closest: close.slice(0, 25),
     search: { enabled: indexed > 0, indexed, error: indexError },
   };
 }

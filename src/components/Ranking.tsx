@@ -8,6 +8,7 @@ type Props = {
   selected: TieView | null;
   onSelect: (tie: TieView) => void;
   onGroup: () => void;
+  onClosest: () => void;
   onReset: () => void;
 };
 
@@ -26,7 +27,7 @@ const TONE = {
 
 const SHOWN = 20;
 
-export function Ranking({ report, selected, onSelect, onGroup, onReset }: Props) {
+export function Ranking({ report, selected, onSelect, onGroup, onClosest, onReset }: Props) {
   const [all, setAll] = useState(false);
   const dormant = report.ties.filter((t) => bucket(t) === "dormant").length;
   // Four hundred rows is a scroll, not a list. Show the ones worth acting on.
@@ -58,8 +59,18 @@ export function Ranking({ report, selected, onSelect, onGroup, onReset }: Props)
       </p>
 
       <button
-        onClick={onGroup}
+        onClick={onClosest}
         className="mt-7 w-full rounded-lg border border-line bg-card px-4 py-3.5 text-left transition-colors hover:border-ember"
+      >
+        <span className="text-[14px] text-bone">Who you are closest to</span>
+        <span className="mt-1 block text-[12px] leading-relaxed text-faint">
+          Six things scored separately, all of them shown.
+        </span>
+      </button>
+
+      <button
+        onClick={onGroup}
+        className="mt-2 w-full rounded-lg border border-line bg-card px-4 py-3.5 text-left transition-colors hover:border-ember"
       >
         <span className="text-[14px] text-bone">Get them all in one room</span>
         <span className="mt-1 block text-[12px] leading-relaxed text-faint">

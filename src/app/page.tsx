@@ -6,11 +6,13 @@ import { Landing } from "@/components/Landing";
 import { Ranking } from "@/components/Ranking";
 import { Detail } from "@/components/Detail";
 import { Friendsgiving } from "@/components/Friendsgiving";
+import { Closest } from "@/components/Closest";
 
 export default function Page() {
   const [report, setReport] = useState<Report | null>(null);
   const [selected, setSelected] = useState<TieView | null>(null);
   const [group, setGroup] = useState(false);
+  const [closest, setClosest] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,6 +55,10 @@ export default function Page() {
     return <Friendsgiving report={report} onBack={() => setGroup(false)} />;
   }
 
+  if (closest) {
+    return <Closest report={report} onBack={() => setClosest(false)} />;
+  }
+
   return (
     <main className="mx-auto grid max-w-[1400px] gap-10 px-6 py-12 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:px-10">
       <Ranking
@@ -60,6 +66,7 @@ export default function Page() {
         selected={selected}
         onSelect={setSelected}
         onGroup={() => setGroup(true)}
+        onClosest={() => setClosest(true)}
         onReset={() => {
           setReport(null);
           setSelected(null);
