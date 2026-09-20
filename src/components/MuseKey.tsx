@@ -56,7 +56,7 @@ export function MuseKeyPanel() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="font-mono text-[10px] uppercase tracking-[0.16em] text-faint transition-colors hover:text-bone"
+        className="font-mono text-[10px] uppercase tracking-[0.2em] text-faint transition-colors hover:text-bone"
       >
         {saved ? "Using your Muse key" : "Use your own Muse key"}
       </button>
@@ -66,7 +66,7 @@ export function MuseKeyPanel() {
   return (
     <div className="rounded-lg border border-line bg-card p-5">
       <div className="flex items-baseline justify-between">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-faint">
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
           Your Muse key
         </p>
         <button
@@ -79,12 +79,12 @@ export function MuseKeyPanel() {
 
       {saved ? (
         <div className="mt-4">
-          <p className="font-mono text-[12px] text-bone">
+          <p className="font-mono text-[11px] text-bone">
             {saved.slice(0, 8)}
             <span className="text-faint">{"…".repeat(3)}</span>
             {saved.slice(-4)}
           </p>
-          <p className="mt-2 text-[12px] leading-relaxed text-faint">
+          <p className="mt-2 text-[11px] leading-relaxed text-faint">
             Drafts run on your account. Stored in this browser only.
           </p>
           <button
@@ -96,7 +96,7 @@ export function MuseKeyPanel() {
         </div>
       ) : (
         <>
-          <p className="mt-3 text-[12px] leading-relaxed text-faint">
+          <p className="mt-3 text-[11px] leading-relaxed text-faint">
             Run <code className="text-muted">muse login</code>, then paste the key. It
             stays in this browser, is sent with each request, and is never stored on
             our side.
@@ -110,7 +110,7 @@ export function MuseKeyPanel() {
               placeholder="LLM|…"
               spellCheck={false}
               autoComplete="off"
-              className="min-w-0 flex-1 rounded-md border border-line bg-ink-soft px-3 py-2 font-mono text-[12px] text-bone placeholder:text-faint"
+              className="min-w-0 flex-1 rounded-md border border-line bg-ink-soft px-3 py-2 font-mono text-[11px] text-bone placeholder:text-faint"
             />
             <button
               onClick={save}

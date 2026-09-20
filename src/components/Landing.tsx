@@ -77,10 +77,10 @@ export function Landing({ onLoad, onLoadDir, busy, stage, error }: Props) {
         over ? "bg-ember/[0.04]" : ""
       }`}
     >
-      <div className="mx-auto grid max-w-[1180px] gap-16 px-6 py-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,500px)] lg:gap-20 lg:py-24">
+      <div className="mx-auto grid max-w-[var(--w-page)] gap-16 px-6 py-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,500px)] lg:gap-20 lg:py-24">
         {/* the argument */}
         <div className="rise">
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ember">
+          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-ember">
             2026 · your year in DMs
           </p>
 
@@ -100,10 +100,10 @@ export function Landing({ onLoad, onLoadDir, busy, stage, error }: Props) {
           <ul className="mt-12 space-y-px overflow-hidden rounded-lg border border-line">
             {SIGNALS.map((s) => (
               <li key={s.kind} className="bg-card px-6 py-5">
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ember">
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ember">
                   {s.kind}
                 </p>
-                <p className="mt-2.5 font-serif text-[19px] leading-snug text-bone">
+                <p className="mt-2.5 font-serif text-[17px] leading-snug text-bone">
                   “{s.quote}”
                 </p>
                 <p className="mt-2 text-[13px] leading-relaxed text-faint">{s.note}</p>
@@ -130,7 +130,7 @@ export function Landing({ onLoad, onLoadDir, busy, stage, error }: Props) {
                 <h2 className="font-serif text-[26px] leading-tight text-bone">
                   Read your archive.
                 </h2>
-                <p className="mt-3 text-[14px] leading-relaxed text-muted">
+                <p className="mt-3 text-[13px] leading-relaxed text-muted">
                   Nothing is uploaded. It is parsed here, on this machine.
                 </p>
 
@@ -140,13 +140,13 @@ export function Landing({ onLoad, onLoadDir, busy, stage, error }: Props) {
                 >
                   Try the sample archive
                 </button>
-                <p className="mt-2.5 text-center text-[12px] text-faint">
+                <p className="mt-2.5 text-center text-[11px] text-faint">
                   Fake conversations, every feature working. No export needed.
                 </p>
 
                 <div className="my-7 flex items-center gap-4">
                   <span className="h-px flex-1 bg-line" />
-                  <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-faint">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
                     or your own
                   </span>
                   <span className="h-px flex-1 bg-line" />
@@ -157,16 +157,16 @@ export function Landing({ onLoad, onLoadDir, busy, stage, error }: Props) {
                     onClick={() => input.current?.click()}
                     className="w-full rounded-md border border-line px-5 py-3 text-left transition-colors hover:border-ember"
                   >
-                    <span className="text-[14px] text-bone">WhatsApp</span>
-                    <span className="mt-0.5 block text-[12px] leading-relaxed text-faint">
+                    <span className="text-[13px] text-bone">WhatsApp</span>
+                    <span className="mt-0.5 block text-[11px] leading-relaxed text-faint">
                       Export Chat → Without Media. Choose the .txt, or drop it
                       anywhere on this page.
                     </span>
                   </button>
 
                   <div className="rounded-md border border-line px-5 py-3">
-                    <p className="text-[14px] text-bone">Instagram</p>
-                    <p className="mt-0.5 text-[12px] leading-relaxed text-faint">
+                    <p className="text-[13px] text-bone">Instagram</p>
+                    <p className="mt-0.5 text-[11px] leading-relaxed text-faint">
                       Your activity → Download your information → HTML. Give it the
                       path to the <code>inbox</code> folder.
                     </p>
@@ -178,7 +178,7 @@ export function Landing({ onLoad, onLoadDir, busy, stage, error }: Props) {
                           e.key === "Enter" && dir.trim() && onLoadDir(dir.trim())
                         }
                         spellCheck={false}
-                        className="w-full min-w-0 flex-1 rounded border border-line bg-ink-soft px-3 py-2 font-mono text-[12px] text-bone sm:w-auto"
+                        className="w-full min-w-0 flex-1 rounded border border-line bg-ink-soft px-3 py-2 font-mono text-[11px] text-bone sm:w-auto"
                       />
                       <button
                         onClick={() => dir.trim() && onLoadDir(dir.trim())}
@@ -205,12 +205,12 @@ export function Landing({ onLoad, onLoadDir, busy, stage, error }: Props) {
                 <div className="mt-7 border-t border-line pt-5">
                   <button
                     onClick={() => setShowPaths((v) => !v)}
-                    className="font-mono text-[10px] uppercase tracking-[0.16em] text-faint transition-colors hover:text-bone"
+                    className="font-mono text-[10px] uppercase tracking-[0.2em] text-faint transition-colors hover:text-bone"
                   >
                     Where your messages go
                   </button>
                   {showPaths ? (
-                    <p className="mt-3 text-[12px] leading-relaxed text-faint">
+                    <p className="mt-3 text-[11px] leading-relaxed text-faint">
                       Parsed on this machine, never written to disk. If search is
                       configured they are indexed in your own Elasticsearch under a
                       random session id. Asking for a draft sends the few quoted

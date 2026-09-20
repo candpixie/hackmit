@@ -17,7 +17,7 @@ export function EvidenceConversation({ evidence }: { evidence: Evidence[] }) {
       data-evidence
       className="min-w-0 rounded-xl border border-line bg-ink/60 p-4 sm:p-5"
     >
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-2 text-[10px] uppercase tracking-[0.15em] text-muted">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-2 text-[10px] uppercase tracking-[0.2em] text-muted">
         <span>From your conversations</span>
         <span className="normal-case tracking-normal">Times in UTC</span>
       </div>

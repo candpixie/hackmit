@@ -73,7 +73,7 @@ export function CardActionDialog({ card }: { card: Card }) {
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.18em] text-ember">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-ember">
               {card.friend.name}
             </p>
             <h2 id={`${id}-title`} className="mt-2 font-serif text-3xl">

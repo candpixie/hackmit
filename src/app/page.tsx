@@ -75,7 +75,7 @@ export default function Page() {
   }
 
   return (
-    <main className="mx-auto grid max-w-[1400px] gap-10 px-6 py-12 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:px-10">
+    <main className="mx-auto grid max-w-[var(--w-page)] gap-10 px-6 py-12 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:px-10">
       <Ranking
         report={report}
         selected={selected}

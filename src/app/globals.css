@@ -39,6 +39,20 @@
 
   --font-serif: var(--font-display), ui-serif, Georgia, serif;
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+
+  /* One type scale. There were thirty two arbitrary pixel sizes across five
+     surfaces, which is why nothing lined up between them. */
+  --text-micro: 10px;
+  --text-label: 11px;
+  --text-small: 13px;
+  --text-body: 15px;
+  --text-lead: 17px;
+  --text-quote: 21px;
+  --text-title: 26px;
+  --text-heading: 34px;
+
+  /* One page width, so every surface has the same measure. */
+  --w-page: 1180px;
 }
 
 /* Paper is kept as the alternate, since it is the one that does not look like

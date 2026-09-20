@@ -5,7 +5,7 @@ import { InsightCard } from "./InsightCard";
 export function InsightsDashboard({ envelope }: { envelope: CardsEnvelope }) {
   const { people, feed } = groupCards(envelope.cards);
   return (
-    <div className="mx-auto max-w-[1180px] px-5 sm:px-8 lg:px-12">
+    <div className="mx-auto max-w-[var(--w-page)] px-5 sm:px-8 lg:px-12">
       <a
         href="#insights-content"
         className="sr-only z-50 rounded bg-bone p-3 text-ink focus:not-sr-only focus:fixed focus:top-4 focus:left-4"
@@ -53,7 +53,7 @@ export function InsightsDashboard({ envelope }: { envelope: CardsEnvelope }) {
             className="scroll-mt-6"
           >
             <div className="mb-5 flex items-baseline gap-4">
-              <h2 id="people-title" className="font-serif text-[28px]">
+              <h2 id="people-title" className="font-serif text-[26px]">
                 Your people
               </h2>
               <span className="text-[11px] text-muted">
@@ -74,7 +74,7 @@ export function InsightsDashboard({ envelope }: { envelope: CardsEnvelope }) {
             className="mt-12 scroll-mt-6 sm:mt-14"
           >
             <div className="mb-5 flex flex-wrap items-baseline justify-between gap-2">
-              <h2 id="feed-title" className="font-serif text-[28px]">
+              <h2 id="feed-title" className="font-serif text-[26px]">
                 A few things you might have missed
               </h2>
               <span className="text-[11px] text-muted">

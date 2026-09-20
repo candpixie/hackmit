@@ -35,7 +35,7 @@ export function InsightCard({
     >
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <span
-          className={`inline-flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.13em] ${featured ? "text-ember" : "text-muted"}`}
+          className={`inline-flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.2em] ${featured ? "text-ember" : "text-muted"}`}
         >
           <CardIcon kind={card.kind} />
           {label || "Insight"}
@@ -63,7 +63,7 @@ export function InsightCard({
             <p className="mb-2 text-xs text-muted">With {card.friend.name}</p>
           ) : null}
           <h3
-            className={`font-serif leading-[1.12] break-words text-bone ${featured ? "text-[34px] sm:text-[38px]" : "text-[27px]"}`}
+            className={`font-serif leading-[1.12] break-words text-bone ${featured ? "text-[34px] sm:text-[38px]" : "text-[26px]"}`}
           >
             {card.title}
           </h3>

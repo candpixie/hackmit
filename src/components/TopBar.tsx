@@ -27,7 +27,7 @@ export function TopBar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-ink/85 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-3 px-4 sm:gap-6 sm:px-6">
+      <div className="mx-auto flex h-14 max-w-[var(--w-page)] items-center gap-3 px-4 sm:gap-6 sm:px-6">
         <a href="/" className="flex shrink-0 items-center gap-2.5">
           {/* The ring, which is the one piece of Instagram nobody mistakes. */}
           <span
@@ -39,7 +39,7 @@ export function TopBar() {
               i
             </span>
           </span>
-          <span className="font-serif text-[17px] leading-none text-bone sm:text-[20px]">
+          <span className="font-serif text-[17px] leading-none text-bone sm:text-[21px]">
             Insta Insights
           </span>
         </a>
@@ -78,7 +78,7 @@ export function TopBar() {
           {checked ? (
             archive.session ? (
               <span
-                className="hidden font-mono text-[10px] uppercase tracking-[0.14em] text-faint sm:inline"
+                className="hidden font-mono text-[10px] uppercase tracking-[0.2em] text-faint sm:inline"
                 title={`${archive.threadCount} conversations, ${archive.messageCount.toLocaleString()} messages`}
               >
                 {archive.owner} · {archive.threadCount.toLocaleString()} chats
@@ -86,7 +86,7 @@ export function TopBar() {
             ) : (
               <a
                 href="/"
-                className="hidden rounded-full border border-line px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-faint transition-colors hover:border-ember hover:text-bone sm:inline-block"
+                className="hidden rounded-full border border-line px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-faint transition-colors hover:border-ember hover:text-bone sm:inline-block"
               >
                 Sample · load yours
               </a>

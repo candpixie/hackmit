@@ -63,16 +63,16 @@ export function Recap({ session, thread }: { session: string; thread: string }) 
   }, [session, thread]);
 
   if (busy) {
-    return <p className="py-8 text-[14px] text-faint">Reading back through it…</p>;
+    return <p className="py-8 text-[13px] text-faint">Reading back through it…</p>;
   }
 
   if (error) {
-    return <p className="py-8 text-[14px] text-ember">{error}</p>;
+    return <p className="py-8 text-[13px] text-ember">{error}</p>;
   }
 
   if (!data?.moments.length) {
     return (
-      <p className="py-8 text-[14px] text-muted">
+      <p className="py-8 text-[13px] text-muted">
         {data?.note ?? "Not enough back and forth here to build a recap."}
       </p>
     );
@@ -84,10 +84,10 @@ export function Recap({ session, thread }: { session: string; thread: string }) 
     <div className="rise py-8">
       {first ? (
         <div className="mb-10">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-faint">
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
             {KIND.first} · {when(first.ts)}
           </p>
-          <p className="mt-3 font-serif text-[19px] leading-snug text-muted">
+          <p className="mt-3 font-serif text-[17px] leading-snug text-muted">
             {first.messages[0]?.sender}: “{first.messages[0]?.text}”
           </p>
         </div>
@@ -99,7 +99,7 @@ export function Recap({ session, thread }: { session: string; thread: string }) 
           <li key={`${m.ts}-${m.kind}`} className="relative">
             <span className="absolute -left-[33px] top-[7px] h-[7px] w-[7px] rounded-full bg-ember" />
 
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-faint">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
               {KIND[m.kind]} · {when(m.ts)}
             </p>
 
@@ -125,7 +125,7 @@ export function Recap({ session, thread }: { session: string; thread: string }) 
       </ol>
 
       {data.closing ? (
-        <p className="mt-10 border-t border-line pt-7 font-serif text-[22px] leading-snug text-bone">
+        <p className="mt-10 border-t border-line pt-7 font-serif text-[21px] leading-snug text-bone">
           {data.closing}
         </p>
       ) : null}

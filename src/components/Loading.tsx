@@ -31,7 +31,7 @@ export function Loading({ stage, note }: { stage: Stage; note?: string }) {
                 }`}
               />
               <span
-                className={`font-mono text-[11px] uppercase tracking-[0.16em] transition-colors ${
+                className={`font-mono text-[11px] uppercase tracking-[0.2em] transition-colors ${
                   now ? "text-bone" : done ? "text-faint" : "text-line"
                 }`}
               >

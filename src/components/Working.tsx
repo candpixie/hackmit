@@ -35,7 +35,7 @@ export function Working({ steps, note }: { steps: [string, number][]; note?: str
           <i className="h-[3px] w-[3px] rounded-full bg-ember [animation:blink_1.2s_ease-in-out_infinite] [animation-delay:160ms]" />
           <i className="h-[3px] w-[3px] rounded-full bg-ember [animation:blink_1.2s_ease-in-out_infinite] [animation-delay:320ms]" />
         </span>
-        <p className="flex-1 font-mono text-[11px] uppercase tracking-[0.16em] text-bone">
+        <p className="flex-1 font-mono text-[11px] uppercase tracking-[0.2em] text-bone">
           {steps[at]?.[0] ?? steps[0][0]}
         </p>
         <p className="font-mono text-[10px] tabular-nums text-faint">{elapsed}s</p>
@@ -45,7 +45,7 @@ export function Working({ steps, note }: { steps: [string, number][]; note?: str
         <div className="h-full w-1/4 rounded-full bg-ember/70 [animation:slide_1.4s_ease-in-out_infinite]" />
       </div>
 
-      {note ? <p className="mt-3 text-[12px] leading-relaxed text-faint">{note}</p> : null}
+      {note ? <p className="mt-3 text-[11px] leading-relaxed text-faint">{note}</p> : null}
     </div>
   );
 }

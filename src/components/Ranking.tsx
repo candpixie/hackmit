@@ -36,12 +36,12 @@ export function Ranking({ report, selected, onSelect, onGroup, onClosest, onRese
   return (
     <aside className="lg:sticky lg:top-12 lg:self-start">
       <div className="flex items-baseline justify-between">
-        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-faint">
+        <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-faint">
           Insta Insights
         </p>
         <button
           onClick={onReset}
-          className="text-[12px] text-faint transition-colors hover:text-bone"
+          className="text-[11px] text-faint transition-colors hover:text-bone"
         >
           Start over
         </button>
@@ -62,8 +62,8 @@ export function Ranking({ report, selected, onSelect, onGroup, onClosest, onRese
         onClick={onClosest}
         className="mt-7 w-full rounded-lg border border-line bg-card px-4 py-3.5 text-left transition-colors hover:border-ember"
       >
-        <span className="text-[14px] text-bone">Who you are closest to</span>
-        <span className="mt-1 block text-[12px] leading-relaxed text-faint">
+        <span className="text-[13px] text-bone">Who you are closest to</span>
+        <span className="mt-1 block text-[11px] leading-relaxed text-faint">
           Six things scored separately, all of them shown.
         </span>
       </button>
@@ -72,8 +72,8 @@ export function Ranking({ report, selected, onSelect, onGroup, onClosest, onRese
         onClick={onGroup}
         className="mt-2 w-full rounded-lg border border-line bg-card px-4 py-3.5 text-left transition-colors hover:border-ember"
       >
-        <span className="text-[14px] text-bone">Get them all in one room</span>
-        <span className="mt-1 block text-[12px] leading-relaxed text-faint">
+        <span className="text-[13px] text-bone">Get them all in one room</span>
+        <span className="mt-1 block text-[11px] leading-relaxed text-faint">
           Search every thread at once for the thing they'd all actually want.
         </span>
       </button>

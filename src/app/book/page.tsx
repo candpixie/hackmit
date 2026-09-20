@@ -139,7 +139,7 @@ export default function BookPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6 py-10">
       <div
-        className="book-stack relative w-full max-w-[1180px] aspect-[3/4] sm:aspect-[4/3] lg:aspect-[16/10]"
+        className="book-stack relative w-full max-w-[var(--w-page)] aspect-[3/4] sm:aspect-[4/3] lg:aspect-[16/10]"
         style={{ perspective: "2600px" }}
         onPointerDown={(e) => (drag.current = e.clientX)}
         onPointerUp={(e) => {
@@ -162,7 +162,7 @@ export default function BookPage() {
       </div>
 
 
-      <div className="mt-7 flex w-full max-w-[1180px] items-center justify-between">
+      <div className="mt-7 flex w-full max-w-[var(--w-page)] items-center justify-between">
         <button
           onClick={() => go(-1)}
           disabled={i === 0}
@@ -170,10 +170,10 @@ export default function BookPage() {
         >
           ← Back
         </button>
-        <p className="hidden font-mono text-[10px] tracking-[0.18em] text-faint sm:block">
+        <p className="hidden font-mono text-[10px] tracking-[0.2em] text-faint sm:block">
           {i + 1} / {pages.length} · arrows, drag, or click the edge
         </p>
-        <p className="font-mono text-[10px] tabular-nums tracking-[0.18em] text-faint sm:hidden">
+        <p className="font-mono text-[10px] tabular-nums tracking-[0.2em] text-faint sm:hidden">
           {i + 1} / {pages.length}
         </p>
         <button
@@ -227,7 +227,7 @@ function Cover({ env }: { env: Envelope }) {
   const n = env.cards.length;
   return (
     <div className="flex h-full flex-col justify-between">
-      <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-faint">
+      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
         {possessive(env.owner)} conversations
       </p>
 
@@ -237,7 +237,7 @@ function Cover({ env }: { env: Envelope }) {
           <br />
           Insights
         </h1>
-        <p className="mt-9 max-w-lg text-[19px] leading-relaxed text-bone">
+        <p className="mt-9 max-w-lg text-[17px] leading-relaxed text-bone">
           The friendships you're about to lose, and the one message that gets them
           back.
         </p>
@@ -259,7 +259,7 @@ function Cover({ env }: { env: Envelope }) {
 function Chapter({ page }: { page: Extract<Page, { type: "chapter" }> }) {
   return (
     <div className="flex h-full flex-col justify-center">
-      <p className="font-serif text-[22px] text-ember">{page.roman}</p>
+      <p className="font-serif text-[21px] text-ember">{page.roman}</p>
       <h2 className="mt-5 max-w-2xl font-serif text-[40px] leading-[1] tracking-tight text-bone sm:text-[52px] lg:text-[68px] lg:leading-[0.95]">
         {page.label}
       </h2>
@@ -278,12 +278,12 @@ function CardSpread({ card }: { card: Card }) {
     <div className="grid h-full gap-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] lg:gap-14">
       {/* recto: the claim */}
       <div className="flex flex-col justify-center">
-        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ember">
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ember">
           {card.friend.name}
           {card.rank ? ` · no. ${card.rank}` : ""}
         </p>
 
-        <h2 className="mt-5 font-serif text-[28px] leading-[1.06] tracking-tight text-bone sm:text-[34px] lg:text-[40px] lg:leading-[1.02]">
+        <h2 className="mt-5 font-serif text-[26px] leading-[1.06] tracking-tight text-bone sm:text-[34px] lg:text-[40px] lg:leading-[1.02]">
           {card.title}
         </h2>
 
@@ -295,7 +295,7 @@ function CardSpread({ card }: { card: Card }) {
           <dl className="mt-9 grid max-w-sm grid-cols-2 gap-x-8 gap-y-5">
             {card.stats.map((s) => (
               <div key={s.label}>
-                <dt className="font-mono text-[9px] uppercase tracking-[0.18em] text-faint">
+                <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
                   {s.label}
                 </dt>
                 <dd className="mt-1 text-[17px] tabular-nums text-bone">{s.value}</dd>
@@ -310,7 +310,7 @@ function CardSpread({ card }: { card: Card }) {
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               rows={3}
-              className="w-full resize-none rounded-md border border-line bg-card px-4 py-3 font-serif text-[16px] leading-relaxed text-bone"
+              className="w-full resize-none rounded-md border border-line bg-card px-4 py-3 font-serif text-[15px] leading-relaxed text-bone"
             />
             <button
               onClick={() => {
@@ -330,7 +330,7 @@ function CardSpread({ card }: { card: Card }) {
       <div className="flex flex-col justify-center lg:overflow-hidden">
         {card.evidence.length ? (
           <>
-            <p className="mb-5 font-mono text-[9px] uppercase tracking-[0.22em] text-faint">
+            <p className="mb-5 font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
               From your messages
             </p>
             <ul className="space-y-2.5">
@@ -344,7 +344,7 @@ function CardSpread({ card }: { card: Card }) {
                 return (
                   <li key={e.id}>
                     {jump ? (
-                      <p className="py-3 text-center font-mono text-[9px] uppercase tracking-[0.2em] text-faint">
+                      <p className="py-3 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
                         {new Date(e.timestamp).toLocaleDateString(undefined, {
                           month: "long",
                           year: "numeric",
@@ -363,7 +363,7 @@ function CardSpread({ card }: { card: Card }) {
                         }`}
                       >
                         <p
-                          className={`font-serif text-[16px] leading-snug ${
+                          className={`font-serif text-[15px] leading-snug ${
                             e.isKey ? "text-bone" : "text-muted"
                           }`}
                         >
@@ -375,13 +375,13 @@ function CardSpread({ card }: { card: Card }) {
                 );
               })}
             </ul>
-            <p className="mt-5 font-mono text-[9px] tracking-[0.16em] text-faint">
+            <p className="mt-5 font-mono text-[10px] tracking-[0.2em] text-faint">
               {card.evidence[0].threadName} ·{" "}
               {new Date(card.evidence[0].timestamp).toLocaleDateString()}
             </p>
           </>
         ) : (
-          <p className="text-[14px] leading-relaxed text-faint">
+          <p className="text-[13px] leading-relaxed text-faint">
             No single message carries this one. It is the shape of the whole
             conversation.
           </p>
@@ -394,32 +394,32 @@ function CardSpread({ card }: { card: Card }) {
 function End({ env }: { env: Envelope }) {
   return (
     <div className="flex h-full flex-col items-center justify-center text-center">
-      <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-faint">
+      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
         The end of the archive
       </p>
       <h2 className="mt-8 max-w-2xl font-serif text-[36px] leading-[1.02] tracking-tight text-bone sm:text-[46px] lg:text-[56px] lg:leading-[0.98]">
         None of them need a paragraph.
       </h2>
-      <p className="mt-7 max-w-lg text-[16px] leading-relaxed text-muted">
+      <p className="mt-7 max-w-lg text-[15px] leading-relaxed text-muted">
         They need you to answer the thing you never answered.
       </p>
 
       <div className="mt-10 flex flex-wrap justify-center gap-3">
         <a
           href="/"
-          className="rounded-md bg-ember px-6 py-3 text-[14px] font-medium text-ink"
+          className="rounded-md bg-ember px-6 py-3 text-[13px] font-medium text-ink"
         >
           Write the message
         </a>
         <a
           href="/insights"
-          className="rounded-md border border-line px-6 py-3 text-[14px] text-muted transition-colors hover:border-faint hover:text-bone"
+          className="rounded-md border border-line px-6 py-3 text-[13px] text-muted transition-colors hover:border-faint hover:text-bone"
         >
           See it as a list
         </a>
         <a
           href="/wrapped"
-          className="rounded-md border border-line px-6 py-3 text-[14px] text-muted transition-colors hover:border-faint hover:text-bone"
+          className="rounded-md border border-line px-6 py-3 text-[13px] text-muted transition-colors hover:border-faint hover:text-bone"
         >
           Your year in DMs
         </a>

@@ -14,7 +14,7 @@ export function Closest({ report, onBack }: { report: Report; onBack: () => void
   if (!report.closest?.length) {
     return (
       <main className="mx-auto max-w-3xl px-6 py-12">
-        <button onClick={onBack} className="text-[12px] text-faint hover:text-bone">
+        <button onClick={onBack} className="text-[11px] text-faint hover:text-bone">
           Back to the list
         </button>
         <p className="mt-8 text-[15px] text-muted">
@@ -25,12 +25,12 @@ export function Closest({ report, onBack }: { report: Report; onBack: () => void
   }
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-12 lg:px-10">
+    <main className="mx-auto max-w-[var(--w-page)] px-6 py-12 lg:px-10">
       <div className="flex items-baseline justify-between">
-        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-faint">
+        <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-faint">
           Closest
         </p>
-        <button onClick={onBack} className="text-[12px] text-faint hover:text-bone">
+        <button onClick={onBack} className="text-[11px] text-faint hover:text-bone">
           Back to the list
         </button>
       </div>
@@ -86,7 +86,7 @@ function Row({
           <span className="font-mono text-[11px] text-faint">
             {String(rank).padStart(2, "0")}
           </span>
-          <span className="flex-1 truncate text-[16px] text-bone">{close.friend}</span>
+          <span className="flex-1 truncate text-[15px] text-bone">{close.friend}</span>
           <span className="shrink-0 font-mono text-[11px] tabular-nums text-faint">
             {close.totalMessages.toLocaleString()} msgs
           </span>
@@ -112,10 +112,10 @@ function Row({
           <dl className="space-y-3.5">
             {close.factors.map((f) => (
               <div key={f.key} className="grid grid-cols-[130px_40px_1fr] items-baseline gap-3">
-                <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
+                <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
                   {f.label}
                 </dt>
-                <dd className="font-mono text-[12px] tabular-nums text-bone">
+                <dd className="font-mono text-[11px] tabular-nums text-bone">
                   {Math.round(f.score * 100)}
                 </dd>
                 <dd className="text-[13px] leading-relaxed text-muted">{f.detail}</dd>

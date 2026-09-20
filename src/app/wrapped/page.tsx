@@ -110,8 +110,8 @@ export default function WrappedPage() {
     return (
       <main className="flex min-h-screen items-center justify-center px-6">
         <div className="w-full max-w-lg">
-          <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-faint">
-            Insta Insights
+          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-ember">
+            Wrapped
           </p>
           <h1 className="mt-5 font-serif text-6xl leading-[0.95] tracking-tight text-bone">
             Your year
@@ -133,7 +133,7 @@ export default function WrappedPage() {
             <button
               onClick={load}
               disabled={busy}
-              className="rounded-md bg-ember px-6 py-3 text-[14px] font-medium text-ink disabled:opacity-50"
+              className="rounded-md bg-ember px-6 py-3 text-[13px] font-medium text-ink disabled:opacity-50"
             >
               {busy ? "Reading…" : "Start"}
             </button>
@@ -161,8 +161,8 @@ export default function WrappedPage() {
       </div>
 
       <div className="flex items-baseline justify-between px-10 pt-5">
-        <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-faint">
-          Insta Insights · Wrapped
+        <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-faint">
+          Your year in DMs
         </p>
         <p className="font-mono text-[11px] tabular-nums text-faint">
           {String(slide + 1).padStart(2, "0")} / {String(SLIDES).padStart(2, "0")}
@@ -203,7 +203,7 @@ export default function WrappedPage() {
 
 function Kicker({ children }: { children: React.ReactNode }) {
   return (
-    <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-ember">
+    <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-ember">
       {children}
     </p>
   );
@@ -213,7 +213,7 @@ function Stat({ n, label }: { n: string; label: string }) {
   return (
     <div>
       <p className="font-serif text-[44px] leading-none tabular-nums text-bone">{n}</p>
-      <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-faint">
+      <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
         {label}
       </p>
     </div>
@@ -230,11 +230,11 @@ function Cover({ d }: { d: Wrapped }) {
           <br />
           Insights
         </h1>
-        <p className="mt-8 max-w-md text-[19px] leading-relaxed text-bone">
+        <p className="mt-8 max-w-md text-[17px] leading-relaxed text-bone">
           The friendships you're about to lose, and the one message that gets them
           back.
         </p>
-        <p className="mt-4 max-w-md text-[14px] leading-relaxed text-muted">
+        <p className="mt-4 max-w-md text-[13px] leading-relaxed text-muted">
           Nobody loses friends in a fight. They lose them to a year of being busy.
         </p>
       </div>
@@ -261,7 +261,7 @@ function Finding({ n, label, sub }: { n: number; label: string; sub: string }) {
         {n}
       </p>
       <div>
-        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-bone">
+        <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-bone">
           {label}
         </p>
         <p className="mt-1 text-[13px] leading-relaxed text-muted">{sub}</p>
@@ -283,7 +283,7 @@ function RawCount({ d }: { d: Wrapped }) {
           <br />
           a novel.
         </h2>
-        <p className="mt-6 text-[14px] leading-relaxed text-muted">
+        <p className="mt-6 text-[13px] leading-relaxed text-muted">
           {s.totals.sent.toLocaleString()} sent, {s.totals.received.toLocaleString()}{" "}
           received, across {s.totals.conversations} conversations.
         </p>
@@ -299,7 +299,7 @@ function RawCount({ d }: { d: Wrapped }) {
       <div>
         <div className="rounded-lg border border-line bg-card p-7">
           <div className="flex items-baseline justify-between">
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-faint">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
               Messages by month
             </p>
             {s.peakMonth ? (
@@ -325,7 +325,7 @@ function RawCount({ d }: { d: Wrapped }) {
             {s.byMonth.map((m, i) => (
               <p
                 key={m.month}
-                className="flex-1 text-center font-mono text-[9px] text-faint"
+                className="flex-1 text-center font-mono text-[10px] text-faint"
               >
                 {i % 2 === 0 ? m.label : ""}
               </p>
@@ -455,20 +455,20 @@ function Plans({ d }: { d: Wrapped }) {
             className="flex items-baseline gap-5 rounded-lg border border-line bg-card px-6 py-5"
           >
             <div className="min-w-0 flex-1">
-              <p className="font-serif text-[18px] leading-snug text-bone">
+              <p className="font-serif text-[17px] leading-snug text-bone">
                 “{p.quote}”
               </p>
               <p className="mt-2 font-mono text-[11px] text-faint">
                 {p.friend} · last {p.daysSince}d ago
               </p>
             </div>
-            <span className="shrink-0 rounded-full border border-ember/40 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-ember">
+            <span className="shrink-0 rounded-full border border-ember/40 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-ember">
               {p.times}×
             </span>
           </li>
         ))}
         {!plans.length ? (
-          <li className="text-[14px] text-muted">
+          <li className="text-[13px] text-muted">
             No plan was raised more than once in this archive.
           </li>
         ) : null}
@@ -503,13 +503,13 @@ function Wants({ d }: { d: Wrapped }) {
         {d.wants.map((w) => (
           <div key={w.id} className="rounded-lg border border-line bg-card px-6 py-5">
             <p className="font-mono text-[11px] text-faint">{w.friend}</p>
-            <p className="mt-3 font-serif text-[18px] leading-snug text-bone">
+            <p className="mt-3 font-serif text-[17px] leading-snug text-bone">
               “{w.quote}”
             </p>
           </div>
         ))}
         {!d.wants.length ? (
-          <p className="text-[14px] text-muted">Nothing specific was wished for here.</p>
+          <p className="text-[13px] text-muted">Nothing specific was wished for here.</p>
         ) : null}
       </div>
     </div>

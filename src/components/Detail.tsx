@@ -99,7 +99,7 @@ export function Detail({
             <button
               key={key}
               onClick={() => setTab(key)}
-              className={`-mb-px border-b pb-3 font-mono text-[11px] uppercase tracking-[0.22em] transition-colors ${
+              className={`-mb-px border-b pb-3 font-mono text-[11px] uppercase tracking-[0.2em] transition-colors ${
                 tab === key
                   ? "border-ember text-bone"
                   : "border-transparent text-faint hover:text-muted"
@@ -116,7 +116,7 @@ export function Detail({
       ) : (
       <div className="pb-8">
         {tie.evidence.length === 0 ? (
-          <p className="mt-5 text-[14px] text-muted">
+          <p className="mt-5 text-[13px] text-muted">
             Nothing specific was left hanging here. The silence is the whole signal.
           </p>
         ) : (
@@ -148,7 +148,7 @@ export function Detail({
               <>
                 <button
                   onClick={write}
-                  className="rounded-md bg-ember px-5 py-2.5 text-[14px] font-medium text-ink transition-opacity hover:opacity-90"
+                  className="rounded-md bg-ember px-5 py-2.5 text-[13px] font-medium text-ink transition-opacity hover:opacity-90"
                 >
                   {`Write to ${tie.friend.split(" ")[0]}`}
                 </button>
@@ -162,7 +162,7 @@ export function Detail({
         ) : (
           <div className="rise">
             <div className="flex items-baseline justify-between">
-              <h3 className="font-mono text-[11px] uppercase tracking-[0.22em] text-faint">
+              <h3 className="font-mono text-[11px] uppercase tracking-[0.2em] text-faint">
                 Draft
               </h3>
               <span className="font-mono text-[11px] text-faint">{draft.model}</span>
@@ -185,14 +185,14 @@ export function Detail({
             <div className="mt-6 flex flex-wrap gap-3">
               <button
                 onClick={() => void navigator.clipboard.writeText(draft.message)}
-                className="rounded-md bg-bone px-5 py-2.5 text-[14px] font-medium text-ink transition-opacity hover:opacity-90"
+                className="rounded-md bg-bone px-5 py-2.5 text-[13px] font-medium text-ink transition-opacity hover:opacity-90"
               >
                 Copy
               </button>
               <button
                 onClick={write}
                 disabled={busy}
-                className="rounded-md border border-line px-5 py-2.5 text-[14px] text-muted transition-colors hover:border-faint hover:text-bone disabled:opacity-60"
+                className="rounded-md border border-line px-5 py-2.5 text-[13px] text-muted transition-colors hover:border-faint hover:text-bone disabled:opacity-60"
               >
                 {busy ? "Writing…" : "Try again"}
               </button>
@@ -208,11 +208,11 @@ export function Detail({
 function Stat({ label, value, note }: { label: string; value: string; note?: string }) {
   return (
     <div>
-      <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-faint">
+      <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
         {label}
       </dt>
-      <dd className="mt-1.5 text-[19px] tabular-nums text-bone">{value}</dd>
-      {note ? <p className="mt-1 text-[12px] text-ember">{note}</p> : null}
+      <dd className="mt-1.5 text-[17px] tabular-nums text-bone">{value}</dd>
+      {note ? <p className="mt-1 text-[11px] text-ember">{note}</p> : null}
     </div>
   );
 }
@@ -238,7 +238,7 @@ function EvidenceCard({
     >
       <div className="flex items-baseline justify-between gap-4">
         <span
-          className={`font-mono text-[10px] uppercase tracking-[0.18em] ${
+          className={`font-mono text-[10px] uppercase tracking-[0.2em] ${
             cited ? "text-ember" : "text-faint"
           }`}
         >
@@ -249,7 +249,7 @@ function EvidenceCard({
         </span>
       </div>
 
-      <blockquote className="mt-3 border-l-2 border-line pl-4 font-serif text-[18px] leading-snug text-bone">
+      <blockquote className="mt-3 border-l-2 border-line pl-4 font-serif text-[17px] leading-snug text-bone">
         {evidence.quote}
       </blockquote>
 
