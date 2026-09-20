@@ -29,6 +29,8 @@ export type RepeatedPlan = {
   friend: string;
   quote: string;
   messageId: string;
+  /** Every separate raise, oldest first. The card quotes all of them. */
+  messageIds: string[];
   /** How many separate times this plan was raised. */
   times: number;
   lastAt: string;
@@ -263,6 +265,7 @@ function repeatedPlans(
         friend: thread.name,
         quote: longest.text.slice(0, 180),
         messageId: longest.id,
+        messageIds: distinct.map((m) => m.id),
         times: distinct.length,
         lastAt: iso(last.ts),
         daysSince: Math.round((now - last.ts) / DAY),

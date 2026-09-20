@@ -163,6 +163,9 @@ a.preview:hover { transform: translateY(-2px); }
 .more:hover { color: #fff; border-color: #555; }
 .more b { background: linear-gradient(90deg, #FCAF45, #E1306C); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
+.emptyPane{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;height:100%;max-width:34rem;padding:0 clamp(1.5rem,5vw,4rem);gap:.75rem}
+.emptyTitle{font-size:1.35rem;font-weight:600;letter-spacing:-.01em;margin:0}
+.emptyBody{color:#8e8e8e;line-height:1.6;margin:0}
 /* cards with nothing to quote */
 .body.solo { grid-template-columns: minmax(0, 720px); justify-content: center; --fs-body: clamp(16px, 2.5vh, 20px); }
 .body.solo .title { font-size: clamp(30px, 5.6vh, 46px); }
@@ -561,11 +564,36 @@ function renderTop() {
   });
 }
 
+/* A page with no cards is a fact about the archive, not a broken screen. It
+   says what was looked for and why nothing came back. */
+const NOT_FOUND = {
+  your_people: 'No chat here has enough back-and-forth to rank honestly.',
+  memory_lane: 'No thread had a long enough run of messages in one sitting to call it a moment.',
+  reconnect: 'No topic came up three or more times, from both of you, and then stopped.',
+  both_wanted: 'Nobody said they wanted the same thing you did in another chat.',
+  unfinished_plans: 'Every plan in here was raised once. Nothing was said twice and dropped.',
+  unanswered: 'Every question you were asked got an answer. Genuinely rare.',
+  recap: 'Not enough history to summarise a whole friendship.'
+};
+
+function emptyPane(page) {
+  const wrap = document.createElement('div');
+  wrap.className = 'emptyPane';
+  const h = document.createElement('p');
+  h.className = 'emptyTitle';
+  h.textContent = 'Nothing here, and that is the finding.';
+  const p = document.createElement('p');
+  p.className = 'emptyBody';
+  p.textContent = NOT_FOUND[page.kind] || 'Nothing in this archive matched.';
+  wrap.append(h, p);
+  return wrap;
+}
+
 function renderSide(page, cards, withEntrance) {
   $('pageName').textContent = page.name;
   $('pageDesc').textContent = page.desc;
   $('listTitle').textContent = 'Messages';
-  $('listCount').textContent = cards.length === 1 ? '1 chat' : `${cards.length} chats`;
+  $('listCount').textContent = cards.length === 0 ? 'none' : cards.length === 1 ? '1 chat' : `${cards.length} chats`;
   const rows = cards.map((card, i) => chatRow(card, i, selectedByPage[pageIndex]));
   if (!withEntrance) rows.forEach(row => { row.firstElementChild.style.animation = 'none'; });
   $('list').replaceChildren(...rows);
@@ -576,7 +604,7 @@ function render(withEntrance) {
   const cards = cardsFor(page.kind);
   const index = Math.min(selectedByPage[pageIndex], cards.length - 1);
   renderTop();
-  if (!cards.length) { renderSide(page, cards, withEntrance); pane.replaceChildren(); return; }
+  if (!cards.length) { renderSide(page, cards, withEntrance); pane.replaceChildren(emptyPane(page)); return; }
   const card = cards[index];
   renderSide(page, cards, withEntrance);
   seenIds.add(card.id);

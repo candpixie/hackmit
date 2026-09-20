@@ -184,9 +184,11 @@ function unfinishedPlans(threads: Thread[], owner: string, now: number): Card[] 
     const thread = threads.find((t) => t.name === p.thread);
     const messages = thread ? [...thread.messages].sort((a, b) => a.ts - b.ts) : [];
 
-    // Every time it came up, all of them the point of the card.
+    // Every time it came up, all of them the point of the card. Quoting only
+    // the longest one loses the fact that makes the card: it kept happening.
+    const raised = new Set(p.messageIds);
     const mentions = messages
-      .filter((m) => m.text.slice(0, 180) === p.quote || m.id === p.messageId)
+      .filter((m) => raised.has(m.id))
       .slice(0, 4)
       .map((m) => ev(m, owner, p.thread, true));
 
@@ -258,18 +260,137 @@ function memoryLane(threads: Thread[], owner: string, ties: Tie[]): Card[] {
 }
 
 /**
+ * The things two people have in common that are worth naming: hobbies, places,
+ * the shared project. Deliberately a closed list. An open one turns every
+ * common noun into a "shared interest" and the cards stop meaning anything.
+ */
+const SUBJECT =
+  /\b(pottery|ceramics|climb\w*|bouldering|hike|hiking|camping|surf\w*|ski|snowboard|pilates|yoga|marathon|tattoo|piano|guitar|drums|paint\w*|draw\w*|knit\w*|bake|baking|cook\w*|pasta|sushi|ramen|korea|japan|tokyo|seoul|paris|iceland|roadtrip|road trip|concert|festival|museum|exhibition|therapy|driving|license)\b/i;
+
+/**
+ * A topic the two of you used to share and stopped talking about.
+ *
+ * Not a plan and not a question: a subject that ran through the conversation
+ * for a while and then went quiet, which is the thing you can pick back up
+ * without apologising for anything first.
+ *
+ * The bar is deliberately high. It must have come up at least three times, on
+ * at least three different days, by both of you, and the last time must be a
+ * long while ago. Two mentions is a coincidence; one-sided is a monologue.
+ */
+/** Topics an unfinished-plans card already shows, so nothing is found twice. */
+function plannedSubjects(plans: Card[]): Set<string> {
+  const out = new Set<string>();
+  for (const card of plans) {
+    for (const e of card.evidence) {
+      const subject = e.text.toLowerCase().match(SUBJECT)?.[0];
+      if (subject) out.add(`${card.friend.threadId}::${subject}`);
+    }
+  }
+  return out;
+}
+
+function pick3(days: Message[], owner: string): Message[] {
+  const first = days[0];
+  const last = days[days.length - 1];
+  const middle = days
+    .slice(1, -1)
+    .find((m) => (m.sender === owner) !== (first.sender === owner)) ?? days[Math.floor(days.length / 2)];
+  return [first, middle, last];
+}
+
+function reconnect(threads: Thread[], owner: string, now: number, taken: Set<string>): Card[] {
+  const QUIET = 180 * 86_400_000;
+  const cards: Card[] = [];
+
+  for (const thread of threads) {
+    const bySubject = new Map<string, Message[]>();
+
+    for (const m of thread.messages) {
+      const subject = m.text.toLowerCase().match(SUBJECT)?.[0];
+      if (!subject) continue;
+      const list = bySubject.get(subject) ?? [];
+      list.push(m);
+      bySubject.set(subject, list);
+    }
+
+    let best: { subject: string; days: Message[] } | null = null;
+
+    for (const [subject, raw] of bySubject) {
+      const mentions = [...raw].sort((a, b) => a.ts - b.ts);
+
+      // One a day at most, so a single excited evening is not a running theme.
+      const days: Message[] = [];
+      for (const m of mentions) {
+        const last = days[days.length - 1];
+        if (!last || new Date(m.ts).toDateString() !== new Date(last.ts).toDateString()) {
+          days.push(m);
+        }
+      }
+      if (days.length < 3) continue;
+
+      // Both of you, or it was never shared.
+      if (!days.some((m) => m.sender === owner)) continue;
+      if (!days.some((m) => m.sender !== owner)) continue;
+
+      // And it has to have actually stopped.
+      if (now - days[days.length - 1].ts < QUIET) continue;
+
+      // If the plans card already shows this exact topic in this exact chat,
+      // it is one finding, not two.
+      if (taken.has(`${thread.name}::${subject}`)) continue;
+
+      if (!best || days.length > best.days.length) best = { subject, days };
+    }
+
+    if (!best) continue;
+
+    const friend = thread.participants.find((p) => p !== owner) ?? thread.name;
+    const last = best.days[best.days.length - 1];
+    const daysSince = Math.round((now - last.ts) / 86_400_000);
+
+    // Oldest, middle, newest: the shape of a topic fading out.
+    // Oldest, then the other person's voice, then the last time it came up:
+    // the shape of a topic fading out, with both of you visibly in it.
+    const shown = best.days.length <= 3 ? best.days : pick3(best.days, owner);
+
+    cards.push({
+      id: id("reconnect", thread.name, best.subject),
+      kind: "reconnect",
+      score: Math.round(Math.min(0.55 + best.days.length * 0.05, 0.9) * 100) / 100,
+      rank: null,
+      friend: { name: friend, threadId: thread.name },
+      title: `You used to talk about ${best.subject}.`,
+      body: `It came up ${best.days.length} times between you, and then it stopped. Neither of you has mentioned it since ${monthYear(last.ts)}, ${ago(daysSince)}.`,
+      stats: [
+        { label: "Times mentioned", value: `${best.days.length}` },
+        { label: "Last mentioned", value: monthYear(last.ts) },
+      ],
+      evidence: shown.map((m) => ev(m, owner, thread.name, true)),
+      action: {
+        label: "Reconnect",
+        draft: `random question but are you still doing the ${best.subject} thing? it came up and i realised i have no idea where you landed with it`,
+      },
+    });
+  }
+
+  return cards.sort((a, b) => b.score - a.score).slice(0, 3);
+}
+
+/**
  * Something both people independently said they wanted, possibly in different
- * chats. This is the card that needs the whole archive at once: neither person
- * ever said it to the other.
+ * chats. This is the card that needs the whole archive at once: the two halves
+ * are in different conversations, so no single thread contains the finding.
  */
 function bothWanted(threads: Thread[], owner: string): Card[] {
+  /** "to Priya" reads wrong for a group chat, "in crit group" for a person. */
+  const where = (w: { thread: string; oneToOne: boolean }) =>
+    w.oneToOne ? `to ${firstName(w.thread)}` : `in ${w.thread}`;
+
   const WANT =
     /\b(i'?ve always wanted|i'?ve been wanting|i really want|dying to|i wish i could|i want to try|i'?d love to)\b/i;
 
-  type Wish = { m: Message; thread: string; subject: string };
-
-  const SUBJECT =
-    /\b(pottery|ceramics|climb\w*|bouldering|hike|hiking|camping|surf\w*|ski|snowboard|pilates|yoga|marathon|tattoo|piano|guitar|drums|paint\w*|draw\w*|knit\w*|bake|baking|cook\w*|pasta|sushi|ramen|korea|japan|tokyo|seoul|paris|iceland|roadtrip|road trip|concert|festival|museum|exhibition|therapy|driving|license)\b/i;
+  type Wish = { m: Message; thread: string; subject: string; oneToOne: boolean };
 
   const mine: Wish[] = [];
   const theirs: Wish[] = [];
@@ -279,7 +400,12 @@ function bothWanted(threads: Thread[], owner: string): Card[] {
       if (!WANT.test(m.text)) continue;
       const subject = m.text.toLowerCase().match(SUBJECT)?.[0];
       if (!subject) continue;
-      (m.sender === owner ? mine : theirs).push({ m, thread: thread.name, subject });
+      (m.sender === owner ? mine : theirs).push({
+        m,
+        thread: thread.name,
+        subject,
+        oneToOne: thread.participants.length <= 2,
+      });
     }
   }
 
@@ -297,9 +423,11 @@ function bothWanted(threads: Thread[], owner: string): Card[] {
       kind: "both_wanted",
       score: 0.82,
       rank: null,
-      friend: { name: wish.thread, threadId: wish.thread },
-      title: `You both wanted to try ${wish.subject}.`,
-      body: `They said it once, you said it somewhere else, months apart. Neither of you said it to the other.`,
+      friend: { name: wish.m.sender, threadId: wish.thread },
+      // The subject word is whatever the sentence used ("cook", "japan"), so
+      // never bend a sentence around it. The quotes say what it was.
+      title: `You both wanted this. Separately.`,
+      body: `${firstName(wish.m.sender)} said it ${where(wish)}. You said the same thing ${where(match)}, months apart. Neither of you ever put the two together.`,
       stats: [],
       // Oldest first, and each from its own chat.
       evidence: [wish, match]
@@ -307,7 +435,7 @@ function bothWanted(threads: Thread[], owner: string): Card[] {
         .map((w) => ev(w.m, owner, w.thread, true)),
       action: {
         label: "Do It Together",
-        draft: `ok random but we have both separately said we want to try ${wish.subject}. why have we never done this together`,
+        draft: `ok random but we have separately said the exact same thing about this. why have we never just done it together`,
       },
     });
   }
@@ -362,10 +490,14 @@ export function buildCards(
 ): CardsEnvelope {
   const ties = analyse(threads, owner, now);
 
+  // Plans run first: a topic they already claim is not also a reconnect.
+  const plans = unfinishedPlans(threads, owner, now);
+
   const cards = [
     ...yourPeople(threads, owner, now),
     ...unanswered(ties, threads, owner),
-    ...unfinishedPlans(threads, owner, now),
+    ...plans,
+    ...reconnect(threads, owner, now, plannedSubjects(plans)),
     ...bothWanted(threads, owner),
     ...memoryLane(threads, owner, ties),
     ...recap(threads, owner, ties, now),

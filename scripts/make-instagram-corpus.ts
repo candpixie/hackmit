@@ -302,6 +302,8 @@ const threads: { folder: string; title: string; lines: Line[] }[] = [];
     { ts: ago(640), sender: M, text: "my flat is overflowing with stuff i genuinely do not need, i want to throw all of it away" },
     { ts: ago(548), sender: M, text: "i'm moving to Berlin in september btw. i got the residency" },
     { ts: ago(547), sender: OWNER, text: "WAIT congrats!!! we have to celebrate before you go" },
+    { ts: ago(930), sender: OWNER, text: "we should book the ceramics thing before term gets unmanageable" },
+    { ts: ago(712), sender: M, text: "we still haven't done the ceramics thing. let's pick a weekend and actually commit" },
     { ts: ago(546), sender: M, text: "next time you're home let's finally do the ceramics thing" },
     { ts: ago(470), sender: M, text: "ok i'm officially here. everything is grey and closed on sundays" },
     { ts: ago(437), sender: M, text: "how did the showcase go?? you never told me" },
@@ -318,6 +320,9 @@ const threads: { folder: string; title: string; lines: Line[] }[] = [];
   chatter(ago(900), ago(3), 13, [OWNER, R], l, "rafa");
   l.push(
     { ts: ago(240), sender: R, text: "i've been meaning to get a proper espresso setup, the one at work is a crime scene" },
+    // The other half of a both-wanted pair. Jonas said the same thing, to the
+    // owner, in his own chat. Neither of them ever put the two together.
+    { ts: ago(233), sender: OWNER, text: "i've always wanted to learn to cook properly. i eat the same four things on a loop" },
     { ts: ago(14), sender: R, text: "you free thursday? that noodle place finally opened" },
     { ts: ago(13), sender: OWNER, text: "yes finally. 7?" },
     { ts: ago(3), sender: R, text: "that was so good. same time next month, i'm booking it now", reaction: `❤${OWNER}` }
@@ -334,6 +339,7 @@ const threads: { folder: string; title: string; lines: Line[] }[] = [];
 
   l.push(
     { ts: ago(780), sender: P, text: "i'm dying to see that exhibition before it closes and literally nobody will come with me" },
+    { ts: ago(730), sender: P, text: "we should do a trip this year. somewhere with no wifi" },
     { ts: ago(512), sender: P, text: "we should do a proper trip. like actually book something instead of talking about it for another year" },
     { ts: ago(333), sender: P, text: "did you end up moving? i saw the photos but i couldn't tell" },
     { ts: ago(301), sender: P, text: "ok i'll stop spamming you 😅 miss you though" }
@@ -357,6 +363,13 @@ const threads: { folder: string; title: string; lines: Line[] }[] = [];
   l.push(
     { ts: ago(815), sender: J, text: "i've always wanted to learn to cook properly, not just survive on the same four meals" },
     { ts: ago(752), sender: J, text: "when you're back in town we're doing the whole day. market, then cooking, then the worst possible film" },
+    // A shared topic rather than a plan: it ran for months, both of you were
+    // in it, then it stopped. This is what a reconnect card is for.
+    { ts: ago(818), sender: J, text: "i started piano again. badly, but again" },
+    { ts: ago(817), sender: OWNER, text: "wait genuinely?? what are you playing" },
+    { ts: ago(790), sender: J, text: "the piano teacher says i hold my wrists like i'm scared of the keys" },
+    { ts: ago(771), sender: OWNER, text: "send a video of the piano thing when you're brave enough" },
+    { ts: ago(748), sender: J, text: "no piano this week, the flat downstairs complained" },
     { ts: ago(746), sender: J, text: "how's the new place treating you" }
   );
   threads.push({ folder: "jonasweber_17398201938475610", title: J, lines: l });
