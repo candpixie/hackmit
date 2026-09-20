@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 
 type Props = {
   onLoad: (files: { name: string; text: string }[] | null) => void;
@@ -28,6 +29,9 @@ export function Landing({ onLoad, onLoadDir, busy, error }: Props) {
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center px-6 py-20">
       <div className="rise">
+        <Link href="/insights" className="mb-8 inline-flex rounded-full border border-line px-4 py-2 text-[13px] text-muted transition-colors hover:border-ember hover:text-bone">
+          Preview the Insights dashboard →
+        </Link>
         <p className="mb-6 font-mono text-[11px] uppercase tracking-[0.22em] text-faint">
           Overdue
         </p>
