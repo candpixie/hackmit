@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Report, TieView } from "@/lib/types";
 import { Working, PLAN_STEPS } from "./Working";
+import { museHeaders } from "./MuseKey";
 
 type Because = { person: string; quote: string; msgId: string };
 type Plan = {
@@ -51,7 +52,7 @@ export function Friendsgiving({ report, onBack }: { report: Report; onBack: () =
     try {
       const res = await fetch("/api/plan", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: { "content-type": "application/json", ...museHeaders() },
         body: JSON.stringify({
           session: report.session,
           people: picked,

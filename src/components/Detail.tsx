@@ -1,5 +1,6 @@
 "use client";
 
+import { museHeaders } from "./MuseKey";
 import { useEffect, useMemo, useState } from "react";
 import { KIND_LABEL, type Evidence, type TieView } from "@/lib/types";
 import { Recap } from "./Recap";
@@ -50,7 +51,7 @@ export function Detail({
     try {
       const res = await fetch("/api/draft", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: { "content-type": "application/json", ...museHeaders() },
         body: JSON.stringify({ tie, owner }),
       });
       const data = await res.json();

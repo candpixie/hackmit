@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Loading } from "./Loading";
+import { MuseKeyPanel } from "./MuseKey";
 import type { Stage } from "@/lib/useArchive";
 import Link from "next/link";
 
@@ -134,6 +135,10 @@ export function Landing({ onLoad, onLoadDir, busy, stage, error }: Props) {
   
             </>
         )}
+
+        <div className="mt-6">
+          <MuseKeyPanel />
+        </div>
 
         {error ? (
           <p className="mt-5 text-[13px] text-ember">{error}</p>

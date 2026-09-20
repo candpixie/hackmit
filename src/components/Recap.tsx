@@ -1,5 +1,6 @@
 "use client";
 
+import { museHeaders } from "./MuseKey";
 import { useEffect, useState } from "react";
 
 type Moment = {
@@ -44,7 +45,7 @@ export function Recap({ session, thread }: { session: string; thread: string }) 
 
     fetch("/api/recap", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", ...museHeaders() },
       body: JSON.stringify({ session, thread }),
     })
       .then(async (res) => {

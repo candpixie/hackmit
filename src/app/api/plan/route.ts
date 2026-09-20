@@ -16,7 +16,15 @@ import type { TieView } from "@/lib/types";
 export const runtime = "nodejs";
 
 const BASE = process.env.LLM_BASE_URL ?? "https://api.meta.ai/v1";
-const KEY = process.env.META_API_KEY ?? process.env.LLM_API_KEY;
+const SERVER_KEY = process.env.META_API_KEY ?? process.env.LLM_API_KEY;
+
+/**
+ * The caller's own key wins. It arrives per request, is used once, and is
+ * never logged or persisted; the server's key is only the fallback.
+ */
+function keyFor(req: Request): string | undefined {
+  return req.headers.get("x-muse-key") ?? SERVER_KEY;
+}
 const MODEL = process.env.LLM_MODEL ?? "muse-spark-1.3";
 
 /**
@@ -126,6 +134,7 @@ function fallbackPlans(hits: Hit[], people: string[]): PlanCandidate[] {
 }
 
 export async function POST(req: Request) {
+  const KEY = keyFor(req);
   const { session, people, ties } = (await req.json()) as {
     session: string;
     people: string[];
