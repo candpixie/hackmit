@@ -35,20 +35,20 @@ export function InsightCard({
     >
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <span
-          className={`inline-flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.13em] ${featured ? "text-ember" : "text-muted"}`}
+          className={`inline-flex items-center gap-2 text-[13px] font-medium uppercase tracking-[0.13em] ${featured ? "text-ember" : "text-muted"}`}
         >
           <CardIcon kind={card.kind} />
           {label || "Insight"}
         </span>
         {card.rank !== null ? (
           <span
-            className="font-mono text-xs text-ember"
+            className="font-mono text-[15px] text-ember"
             aria-label={`Rank ${card.rank}`}
           >
             No. {String(card.rank).padStart(2, "0")}
           </span>
         ) : featured ? (
-          <span className="rounded-full bg-ember/10 px-2.5 py-1 text-[10px] text-ember">
+          <span className="rounded-full bg-ember/10 px-2.5 py-1 text-[13px] text-ember">
             Worth a little attention
           </span>
         ) : null}
@@ -60,14 +60,14 @@ export function InsightCard({
       >
         <div className="flex min-w-0 flex-col items-start">
           {card.title !== card.friend.name ? (
-            <p className="mb-2 text-xs text-muted">With {card.friend.name}</p>
+            <p className="mb-2 text-[15px] text-muted">With {card.friend.name}</p>
           ) : null}
           <h3
-            className={`font-serif leading-[1.12] break-words text-bone ${featured ? "text-[34px] sm:text-[38px]" : "text-[27px]"}`}
+            className={`font-serif leading-[1.12] break-words text-bone ${featured ? "text-[34px] sm:text-[38px]" : "text-[31px]"}`}
           >
             {card.title}
           </h3>
-          <p className="mt-3 text-[13px] leading-[1.8] text-muted">
+          <p className="mt-3 text-[16px] leading-[1.8] text-muted">
             {card.body}
           </p>
           {card.stats.length ? (
@@ -77,10 +77,10 @@ export function InsightCard({
             >
               {card.stats.map((stat, index) => (
                 <div key={`${stat.label}:${index}`} className="min-w-0">
-                  <dt className="text-[10px] leading-relaxed text-muted">
+                  <dt className="text-[13px] leading-relaxed text-muted">
                     {stat.label}
                   </dt>
-                  <dd className="mt-1 break-words text-[13px] leading-relaxed text-bone">
+                  <dd className="mt-1 break-words text-[16px] leading-relaxed text-bone">
                     {stat.value}
                   </dd>
                 </div>

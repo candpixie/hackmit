@@ -12,6 +12,8 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
+import { withoutEmoji } from "@/lib/display-text";
+import { ReplayArt } from "@/components/ReplayArt";
 import { useArchive } from "@/lib/useArchive";
 
 type Evidence = { kind: string; quote: string; reason: string; messageId: string };
@@ -50,6 +52,7 @@ type Wrapped = {
       evidence: Evidence[];
     };
   } | null;
+  pendingPlans?: { friend: string; quote: string; id: string }[];
   wants: { friend: string; quote: string; id: string }[];
 };
 
@@ -62,11 +65,30 @@ export default function WrappedPage() {
   const [dir, setDir] = useState("~/Downloads/inbox");
   const [busy, setBusy] = useState(false);
   const [slide, setSlide] = useState(0);
+  const [sample, setSample] = useState(false);
+
+  async function preview() {
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/wrapped?sample=1");
+      if (!res.ok) throw new Error("Could not load the sample archive.");
+      setData(await res.json());
+      setSample(true);
+      setSlide(0);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not load preview.");
+    } finally { setBusy(false); }
+  }
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("demo") === "1") void preview();
+  }, []);
 
   // Another surface already parsed this archive; re-reading it costs half a
   // minute for nothing.
   useEffect(() => {
-    if (!checked || !archive.session || data) return;
+    if (!checked || !archive.session || data || new URLSearchParams(window.location.search).get("demo") === "1") return;
     fetch(`/api/wrapped?session=${encodeURIComponent(archive.session)}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => d && setData(d as Wrapped))
@@ -79,6 +101,8 @@ export default function WrappedPage() {
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
+      if ((e.target as HTMLElement).closest("input, textarea, button, a, [contenteditable]")) return;
+      if (["ArrowRight", "ArrowLeft", " "].includes(e.key)) e.preventDefault();
       if (e.key === "ArrowRight" || e.key === " ") go(1);
       if (e.key === "ArrowLeft") go(-1);
     }
@@ -97,6 +121,7 @@ export default function WrappedPage() {
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? "Could not read that archive.");
+      setSample(false);
       setData(body as Wrapped);
       setSlide(0);
     } catch (e) {
@@ -108,9 +133,9 @@ export default function WrappedPage() {
 
   if (!data) {
     return (
-      <main className="flex min-h-screen items-center justify-center px-6">
+      <main className="wrapped-intro flex min-h-screen items-center justify-center px-6">
         <div className="w-full max-w-lg">
-          <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-faint">
+          <p className="font-sans text-[14px] uppercase tracking-[0.14em] text-faint">
             Overdue
           </p>
           <h1 className="mt-5 font-serif text-6xl leading-[0.95] tracking-tight text-bone">
@@ -118,36 +143,39 @@ export default function WrappedPage() {
             <br />
             in DMs.
           </h1>
-          <p className="mt-6 text-[15px] leading-relaxed text-muted">
+          <p className="mt-6 text-[18px] leading-relaxed text-muted">
             Point it at your Instagram export. Everything is counted from the archive
             and nothing leaves this machine.
           </p>
 
           <div className="mt-8 flex gap-3">
             <input
+              aria-label="Instagram export folder"
               value={dir}
               onChange={(e) => setDir(e.target.value)}
               spellCheck={false}
-              className="min-w-0 flex-1 rounded-md border border-line bg-card px-4 py-3 font-mono text-[13px] text-bone"
+              className="min-w-0 flex-1 rounded-md border border-line bg-card px-4 py-3 font-sans text-[16px] text-bone"
             />
             <button
               onClick={load}
               disabled={busy}
-              className="rounded-md bg-ember px-6 py-3 text-[14px] font-medium text-ink disabled:opacity-50"
+              className="rounded-md bg-ember px-6 py-3 text-[17px] font-medium text-ink disabled:opacity-50"
             >
               {busy ? "Reading…" : "Start"}
             </button>
           </div>
-          {error ? <p className="mt-4 text-[13px] text-ember">{error}</p> : null}
+          <button className="preview-button" onClick={preview} disabled={busy}>Explore the sample Wrapped <span aria-hidden="true">↗</span></button>
+          {error ? <p className="mt-4 text-[16px] text-ember">{error}</p> : null}
         </div>
       </main>
     );
   }
 
   return (
-    <main className="relative flex min-h-screen flex-col">
+    <main className={`wrapped-stage wrapped-slide-${slide} relative flex flex-col`} aria-label="Your Wrapped slides">
+      <ReplayArt variant={slide} />
       {/* progress */}
-      <div className="flex gap-1.5 px-10 pt-8">
+      <div className="wrapped-progress flex gap-1.5 px-10 pt-8">
         {Array.from({ length: SLIDES }).map((_, i) => (
           <button
             key={i}
@@ -155,21 +183,22 @@ export default function WrappedPage() {
             className={`h-[2px] flex-1 rounded-full transition-colors ${
               i <= slide ? "bg-bone" : "bg-line"
             }`}
+            aria-current={i === slide ? "step" : undefined}
             aria-label={`Slide ${i + 1}`}
           />
         ))}
       </div>
 
-      <div className="flex items-baseline justify-between px-10 pt-5">
-        <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-faint">
-          Overdue · Wrapped
+      <div className="wrapped-meta flex flex-wrap items-baseline justify-between gap-3 px-10 pt-5">
+        <p className="font-sans text-[14px] uppercase tracking-[0.14em] text-faint">
+          Overdue / Your social replay
         </p>
-        <p className="font-mono text-[11px] tabular-nums text-faint">
-          {String(slide + 1).padStart(2, "0")} / {String(SLIDES).padStart(2, "0")}
+        <p className="font-sans text-[14px] tabular-nums text-faint">
+          {sample ? "SAMPLE ARCHIVE · " : ""}{String(slide + 1).padStart(2, "0")} / {String(SLIDES).padStart(2, "0")}
         </p>
       </div>
 
-      <div key={slide} className="rise flex flex-1 items-center px-10 py-10">
+      <div key={slide} className="wrapped-content rise flex flex-1 items-center px-10 py-10" aria-live="polite">
         {slide === 0 ? <Cover d={data} /> : null}
         {slide === 1 ? <RawCount d={data} /> : null}
         {slide === 2 ? <Guess d={data} /> : null}
@@ -178,21 +207,21 @@ export default function WrappedPage() {
         {slide === 5 ? <Ending d={data} /> : null}
       </div>
 
-      <div className="flex items-center justify-between px-10 pb-8">
+      <div className="wrapped-controls flex items-center justify-between px-10 pb-8">
         <button
           onClick={() => go(-1)}
           disabled={slide === 0}
-          className="font-mono text-[11px] uppercase tracking-[0.2em] text-faint transition-colors hover:text-bone disabled:opacity-25"
+          className="font-sans text-[14px] uppercase tracking-[0.12em] text-faint transition-colors hover:text-bone disabled:opacity-25"
         >
           ← Back
         </button>
-        <p className="font-mono text-[10px] text-faint">Arrow keys</p>
+        <p className="font-sans text-[13px] text-faint">Arrow keys</p>
         <button
           onClick={() => go(1)}
           disabled={slide === SLIDES - 1}
-          className="font-mono text-[11px] uppercase tracking-[0.2em] text-faint transition-colors hover:text-bone disabled:opacity-25"
+          className="font-sans text-[14px] uppercase tracking-[0.12em] text-faint transition-colors hover:text-bone disabled:opacity-25"
         >
-          Next →
+          {slide === SLIDES - 1 ? "The end" : "Next →"}
         </button>
       </div>
     </main>
@@ -203,7 +232,7 @@ export default function WrappedPage() {
 
 function Kicker({ children }: { children: React.ReactNode }) {
   return (
-    <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-ember">
+    <p className="font-sans text-[14px] uppercase tracking-[0.14em] text-ember">
       {children}
     </p>
   );
@@ -213,7 +242,7 @@ function Stat({ n, label }: { n: string; label: string }) {
   return (
     <div>
       <p className="font-serif text-[44px] leading-none tabular-nums text-bone">{n}</p>
-      <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-faint">
+      <p className="mt-2 font-sans text-[13px] uppercase tracking-[0.1em] text-faint">
         {label}
       </p>
     </div>
@@ -224,18 +253,18 @@ function Cover({ d }: { d: Wrapped }) {
   return (
     <div className="mx-auto grid w-full max-w-6xl gap-16 lg:grid-cols-2 lg:items-center">
       <div>
-        <Kicker>Your year in DMs</Kicker>
+        <Kicker>The people. The plans. The plot.</Kicker>
         <h1 className="mt-6 font-serif text-[104px] leading-[0.85] tracking-tight text-bone">
-          Over
+          Your people.
           <br />
-          due
+          On repeat.
         </h1>
-        <p className="mt-8 max-w-md text-[19px] leading-relaxed text-bone">
-          The friendships you're about to lose, and the one message that gets them
-          back.
+        <p className="mt-8 max-w-md text-[22px] leading-relaxed text-bone">
+          A whole year of “you had to be there.”
+          Let’s bring the best bits back.
         </p>
-        <p className="mt-4 max-w-md text-[14px] leading-relaxed text-muted">
-          Nobody loses friends in a fight. They lose them to a year of being busy.
+        <p className="mt-4 max-w-md text-[17px] leading-relaxed text-muted">
+          Your conversations have a story. This is your replay.
         </p>
       </div>
 
@@ -244,7 +273,7 @@ function Cover({ d }: { d: Wrapped }) {
         <Finding n={d.counts.neverHappened} label="Never happened" sub="plans said out loud, agreed to, never booked" />
         <Finding n={d.counts.theyWanted} label="They wanted" sub="things mentioned in passing, across your chats" />
 
-        <p className="pt-6 text-[13px] leading-relaxed text-faint">
+        <p className="pt-6 text-[16px] leading-relaxed text-faint">
           Read from {d.stats.totals.conversations.toLocaleString()} conversations and{" "}
           {d.stats.totals.messages.toLocaleString()} messages on this machine. Nothing
           left it.
@@ -261,10 +290,10 @@ function Finding({ n, label, sub }: { n: number; label: string; sub: string }) {
         {n}
       </p>
       <div>
-        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-bone">
+        <p className="font-sans text-[14px] uppercase tracking-[0.1em] text-bone">
           {label}
         </p>
-        <p className="mt-1 text-[13px] leading-relaxed text-muted">{sub}</p>
+        <p className="mt-1 text-[16px] leading-relaxed text-muted">{sub}</p>
       </div>
     </div>
   );
@@ -283,12 +312,12 @@ function RawCount({ d }: { d: Wrapped }) {
           <br />
           a novel.
         </h2>
-        <p className="mt-6 text-[14px] leading-relaxed text-muted">
+        <p className="mt-6 text-[17px] leading-relaxed text-muted">
           {s.totals.sent.toLocaleString()} sent, {s.totals.received.toLocaleString()}{" "}
           received, across {s.totals.conversations} conversations.
         </p>
         {s.timezoneShiftHours !== 0 ? (
-          <p className="mt-5 border-l-2 border-line pl-4 text-[13px] leading-relaxed text-faint">
+          <p className="mt-5 border-l-2 border-line pl-4 text-[16px] leading-relaxed text-faint">
             Your export was written {Math.abs(s.timezoneShiftHours)} hours off from
             where these were actually sent. We worked that out from the hours you
             sleep, and corrected it.
@@ -299,11 +328,11 @@ function RawCount({ d }: { d: Wrapped }) {
       <div>
         <div className="rounded-lg border border-line bg-card p-7">
           <div className="flex items-baseline justify-between">
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-faint">
+            <p className="font-sans text-[13px] uppercase tracking-[0.1em] text-faint">
               Messages by month
             </p>
             {s.peakMonth ? (
-              <p className="font-mono text-[10px] text-faint">
+              <p className="font-sans text-[13px] text-faint">
                 peak {s.peakMonth.label} · {s.peakMonth.count.toLocaleString()}
               </p>
             ) : null}
@@ -325,7 +354,7 @@ function RawCount({ d }: { d: Wrapped }) {
             {s.byMonth.map((m, i) => (
               <p
                 key={m.month}
-                className="flex-1 text-center font-mono text-[9px] text-faint"
+                className="flex-1 text-center font-sans text-[11px] text-faint"
               >
                 {i % 2 === 0 ? m.label : ""}
               </p>
@@ -372,7 +401,7 @@ function Guess({ d }: { d: Wrapped }) {
             <br />
             ignored the most?
           </h2>
-          <p className="mt-5 text-[15px] text-muted">
+          <p className="mt-5 text-[18px] text-muted">
             Pick one. Then we'll show you what they asked.
           </p>
 
@@ -383,8 +412,8 @@ function Guess({ d }: { d: Wrapped }) {
                 onClick={() => setPicked(o.thread)}
                 className="rounded-lg border border-line bg-card px-5 py-6 text-left transition-colors hover:border-ember"
               >
-                <p className="truncate text-[17px] text-bone">{o.friend}</p>
-                <p className="mt-2 font-mono text-[11px] text-faint">
+                <p className="truncate text-[20px] text-bone">{o.friend}</p>
+                <p className="mt-2 font-sans text-[14px] text-faint">
                   {o.totalMessages.toLocaleString()} messages
                 </p>
               </button>
@@ -396,7 +425,7 @@ function Guess({ d }: { d: Wrapped }) {
           <h2 className="mt-6 font-serif text-[52px] leading-[0.95] tracking-tight text-bone">
             {right ? "You knew." : "It was " + g.reveal.friend + "."}
           </h2>
-          <p className="mt-4 text-[15px] text-muted">
+          <p className="mt-4 text-[18px] text-muted">
             {right
               ? `${g.reveal.friend}. ${g.reveal.headline}`
               : `You picked someone else. ${g.reveal.headline}`}
@@ -405,17 +434,17 @@ function Guess({ d }: { d: Wrapped }) {
           <ul className="mt-9 space-y-3">
             {g.reveal.evidence.map((e) => (
               <li key={e.messageId} className="rounded-lg border border-ember/40 bg-ember/[0.06] px-6 py-5">
-                <blockquote className="border-l-2 border-ember/50 pl-4 font-serif text-[21px] leading-snug text-bone">
-                  {e.quote}
+                <blockquote className="border-l-2 border-ember/50 pl-4 font-serif text-[24px] leading-snug text-bone">
+                  {withoutEmoji(e.quote)}
                 </blockquote>
-                <p className="mt-3 text-[13px] text-muted">{e.reason}</p>
+                <p className="mt-3 text-[16px] text-muted">{e.reason}</p>
               </li>
             ))}
           </ul>
 
           <button
             onClick={() => setPicked(null)}
-            className="mt-7 font-mono text-[11px] uppercase tracking-[0.2em] text-faint hover:text-bone"
+            className="mt-7 font-sans text-[14px] uppercase tracking-[0.12em] text-faint hover:text-bone"
           >
             Guess again
           </button>
@@ -435,12 +464,12 @@ function Plans({ d }: { d: Wrapped }) {
         <h2 className="mt-6 font-serif text-[56px] leading-[0.95] tracking-tight text-bone">
           You made {d.counts.neverHappened} plans.
         </h2>
-        <p className="mt-6 text-[15px] leading-relaxed text-muted">
+        <p className="mt-6 text-[18px] leading-relaxed text-muted">
           Said out loud, agreed to enthusiastically, then never mentioned again by
           either of you.
         </p>
         {plans[0] ? (
-          <p className="mt-7 rounded-lg border border-line bg-card px-6 py-5 text-[15px] leading-relaxed text-bone">
+          <p className="mt-7 rounded-lg border border-line bg-card px-6 py-5 text-[18px] leading-relaxed text-bone">
             {plans[0].friend} brought this up{" "}
             <span className="text-ember">{plans[0].times} times</span>. The last was{" "}
             {plans[0].daysSince} days ago, and nobody has raised it since.
@@ -451,24 +480,30 @@ function Plans({ d }: { d: Wrapped }) {
       <ul className="space-y-3">
         {plans.map((p) => (
           <li
-            key={p.quote}
+            key={withoutEmoji(p.quote)}
             className="flex items-baseline gap-5 rounded-lg border border-line bg-card px-6 py-5"
           >
             <div className="min-w-0 flex-1">
-              <p className="font-serif text-[18px] leading-snug text-bone">
-                “{p.quote}”
+              <p className="font-serif text-[21px] leading-snug text-bone">
+                “{withoutEmoji(p.quote)}”
               </p>
-              <p className="mt-2 font-mono text-[11px] text-faint">
+              <p className="mt-2 font-sans text-[14px] text-faint">
                 {p.friend} · last {p.daysSince}d ago
               </p>
             </div>
-            <span className="shrink-0 rounded-full border border-ember/40 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-ember">
+            <span className="shrink-0 rounded-full border border-ember/40 px-3 py-1 font-sans text-[13px] uppercase tracking-[0.14em] text-ember">
               {p.times}×
             </span>
           </li>
         ))}
-        {!plans.length ? (
-          <li className="text-[14px] text-muted">
+        {!plans.length && d.pendingPlans?.map((p) => (
+          <li key={p.id} className="rounded-lg bg-card px-6 py-5">
+            <p className="font-sans text-[14px] text-faint">{p.friend}</p>
+            <p className="mt-3 font-serif text-[23px] leading-snug text-bone">“{withoutEmoji(p.quote)}”</p>
+          </li>
+        ))}
+        {!plans.length && !d.pendingPlans?.length ? (
+          <li className="text-[17px] text-muted">
             No plan was raised more than once in this archive.
           </li>
         ) : null}
@@ -489,27 +524,27 @@ function Wants({ d }: { d: Wrapped }) {
           <br />
           in passing.
         </h2>
-        <p className="mt-6 text-[15px] leading-relaxed text-muted">
+        <p className="mt-6 text-[18px] leading-relaxed text-muted">
           Said once, never followed up on, scattered across different chats months
           apart.
         </p>
-        <p className="mt-7 border-l-2 border-line pl-4 text-[13px] leading-relaxed text-faint">
-          This is the query a per-thread scroll cannot answer: who has ever mentioned
-          wanting this. It spans people, so it runs in Elasticsearch.
+        <p className="mt-7 border-l-2 border-line pl-4 text-[16px] leading-relaxed text-faint">
+          A tiny detail can become your next great plan.
+          Consider this your saved-for-later list.
         </p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
         {d.wants.map((w) => (
           <div key={w.id} className="rounded-lg border border-line bg-card px-6 py-5">
-            <p className="font-mono text-[11px] text-faint">{w.friend}</p>
-            <p className="mt-3 font-serif text-[18px] leading-snug text-bone">
-              “{w.quote}”
+            <p className="font-sans text-[14px] text-faint">{w.friend}</p>
+            <p className="mt-3 font-serif text-[21px] leading-snug text-bone">
+              “{withoutEmoji(w.quote)}”
             </p>
           </div>
         ))}
         {!d.wants.length ? (
-          <p className="text-[14px] text-muted">Nothing specific was wished for here.</p>
+          <p className="text-[17px] text-muted">Nothing specific was wished for here.</p>
         ) : null}
       </div>
     </div>
@@ -525,19 +560,19 @@ function Ending({ d }: { d: Wrapped }) {
         <br />
         are going quiet.
       </h2>
-      <p className="mx-auto mt-8 max-w-xl text-[17px] leading-relaxed text-muted">
+      <p className="mx-auto mt-8 max-w-xl text-[20px] leading-relaxed text-muted">
         None of them need a paragraph. They need you to answer the thing you never
         answered.
       </p>
 
       <a
         href="/"
-        className="mt-10 inline-block rounded-md bg-ember px-7 py-3.5 text-[15px] font-medium text-ink transition-opacity hover:opacity-90"
+        className="mt-10 inline-block rounded-md bg-ember px-7 py-3.5 text-[18px] font-medium text-ink transition-opacity hover:opacity-90"
       >
         Write the message
       </a>
 
-      <p className="mt-8 font-mono text-[11px] leading-relaxed text-faint">
+      <p className="mt-8 font-sans text-[14px] leading-relaxed text-faint">
         Every number here was counted from your archive. No percentiles, no scores we
         invented a scale for.
       </p>

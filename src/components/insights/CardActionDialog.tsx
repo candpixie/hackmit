@@ -47,7 +47,7 @@ export function CardActionDialog({ card }: { card: Card }) {
       <button
         type="button"
         onClick={open}
-        className="inline-flex min-h-11 items-center justify-center gap-3 rounded-lg bg-bone px-4 py-2.5 text-[13px] font-medium text-ink transition-colors hover:bg-ember focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember"
+        className="inline-flex min-h-11 items-center justify-center gap-3 rounded-lg bg-bone px-4 py-2.5 text-[16px] font-medium text-ink transition-colors hover:bg-ember focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember"
       >
         {action.label}
         <ArrowIcon />
@@ -73,7 +73,7 @@ export function CardActionDialog({ card }: { card: Card }) {
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.18em] text-ember">
+            <p className="text-[13px] uppercase tracking-[0.18em] text-ember">
               {card.friend.name}
             </p>
             <h2 id={`${id}-title`} className="mt-2 font-serif text-3xl">
@@ -91,7 +91,7 @@ export function CardActionDialog({ card }: { card: Card }) {
         </div>
         <p
           id={`${id}-description`}
-          className="mt-3 text-sm leading-relaxed text-muted"
+          className="mt-3 text-[17px] leading-relaxed text-muted"
         >
           {hasDraft
             ? "A starting point for your next conversation. Edit it, then copy when you're ready."
@@ -101,7 +101,7 @@ export function CardActionDialog({ card }: { card: Card }) {
           <div className="mt-6">
             <label
               htmlFor={`${id}-draft`}
-              className="mb-2 block text-xs text-muted"
+              className="mb-2 block text-[15px] text-muted"
             >
               Your message
             </label>
@@ -120,7 +120,7 @@ export function CardActionDialog({ card }: { card: Card }) {
           <div
             tabIndex={0}
             aria-label="Share preview"
-            className="mt-6 rounded-xl border border-line bg-ink p-4 text-sm leading-relaxed whitespace-pre-wrap break-words"
+            className="mt-6 rounded-xl border border-line bg-ink p-4 text-[17px] leading-relaxed whitespace-pre-wrap break-words"
           >
             {text}
           </div>
@@ -128,7 +128,7 @@ export function CardActionDialog({ card }: { card: Card }) {
         <p
           role="status"
           aria-live="polite"
-          className="mt-3 min-h-5 text-xs text-sage"
+          className="mt-3 min-h-5 text-[15px] text-sage"
         >
           {feedback}
         </p>
@@ -137,14 +137,14 @@ export function CardActionDialog({ card }: { card: Card }) {
             type="button"
             onClick={copy}
             disabled={!text.trim()}
-            className="min-h-11 rounded-lg bg-ember px-5 py-2.5 text-sm font-medium text-ink disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember"
+            className="min-h-11 rounded-lg bg-ember px-5 py-2.5 text-[17px] font-medium text-ink disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember"
           >
             Copy
           </button>
           <button
             type="button"
             onClick={() => dialog.current?.close()}
-            className="min-h-11 rounded-lg border border-line px-5 py-2.5 text-sm text-muted hover:text-bone focus-visible:outline-2 focus-visible:outline-ember"
+            className="min-h-11 rounded-lg border border-line px-5 py-2.5 text-[17px] text-muted hover:text-bone focus-visible:outline-2 focus-visible:outline-ember"
           >
             {hasDraft ? "Cancel" : "Close"}
           </button>
@@ -153,13 +153,13 @@ export function CardActionDialog({ card }: { card: Card }) {
               href="https://www.instagram.com/direct/inbox/"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex min-h-11 items-center px-1 text-xs text-muted underline underline-offset-4 hover:text-bone"
+              className="inline-flex min-h-11 items-center px-1 text-[15px] text-muted underline underline-offset-4 hover:text-bone"
             >
               Open Instagram ↗
             </a>
           ) : null}
         </div>
-        <p className="mt-5 text-[11px] text-muted">
+        <p className="mt-5 text-[14px] text-muted">
           {hasDraft
             ? "Nothing is sent automatically. Instagram opens your inbox; choose the conversation yourself."
             : "Only the recap text and stats are copied. Source messages stay here."}

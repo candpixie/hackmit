@@ -17,7 +17,7 @@ const TABS = [
   { href: "/", label: "Find", hint: "Who has gone quiet" },
   { href: "/book", label: "Read", hint: "The archive as a book" },
   { href: "/wrapped", label: "Wrapped", hint: "Your year in DMs" },
-  { href: "/insights", label: "Cards", hint: "Everything as a list" },
+  { href: "/insights", label: "Dashboard", hint: "Everything as a list" },
 ];
 
 export function TopBar() {
@@ -25,7 +25,7 @@ export function TopBar() {
   const { archive, checked } = useArchive();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-ink/85 backdrop-blur">
+    <header className="site-header sticky top-0 z-40 border-b border-line bg-ink/85 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-6 px-6">
         <a href="/" className="shrink-0 font-serif text-[20px] leading-none text-bone">
           Overdue

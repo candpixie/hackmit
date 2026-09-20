@@ -68,6 +68,9 @@ function build(threads: Thread[], owner: string, session: string) {
       dormant: dormant.length,
     },
     ties: ties.slice(0, 12),
+    pendingPlans: ties.flatMap((t) => t.evidence
+      .filter((e) => e.kind === "promise")
+      .map((e) => ({ friend: t.friend, quote: e.quote, id: e.messageId }))).slice(0, 3),
     guess: answer
       ? {
           answerThread: answer.thread,
@@ -100,7 +103,12 @@ function build(threads: Thread[], owner: string, session: string) {
 }
 
 export async function GET(req: Request) {
-  const session = new URL(req.url).searchParams.get("session");
+  const params = new URL(req.url).searchParams;
+  if (params.get("sample") === "1") {
+    const threads = await readInstagramDir(join(process.cwd(), "data", "corpus-instagram", "inbox"));
+    return NextResponse.json(build(threads, inferOwner(threads), "sample"));
+  }
+  const session = params.get("session");
   if (!session) return NextResponse.json({ error: "No session." }, { status: 400 });
 
   const held = await recallDurable(session);

@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, Inter } from "next/font/google";
+import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 import "./globals.css";
 import { TopBar } from "@/components/TopBar";
 
-const display = Instrument_Serif({
-  weight: "400",
+const display = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-display",
 });

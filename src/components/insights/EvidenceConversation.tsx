@@ -1,3 +1,4 @@
+import { withoutEmoji } from "@/lib/display-text";
 import { Fragment } from "react";
 import {
   displayDate,
@@ -17,7 +18,7 @@ export function EvidenceConversation({ evidence }: { evidence: Evidence[] }) {
       data-evidence
       className="min-w-0 rounded-xl border border-line bg-ink/60 p-4 sm:p-5"
     >
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-2 text-[10px] uppercase tracking-[0.15em] text-muted">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-2 text-[13px] uppercase tracking-[0.15em] text-muted">
         <span>From your conversations</span>
         <span className="normal-case tracking-normal">Times in UTC</span>
       </div>
@@ -27,7 +28,7 @@ export function EvidenceConversation({ evidence }: { evidence: Evidence[] }) {
             {startsExchange(message, evidence[index - 1]) ? (
               <div
                 data-date-separator
-                className="flex items-center gap-3 py-2 text-center text-[10px] text-muted"
+                className="flex items-center gap-3 py-2 text-center text-[13px] text-muted"
               >
                 <span className="h-px flex-1 bg-line" />
                 <time dateTime={message.timestamp}>
@@ -50,7 +51,7 @@ export function EvidenceConversation({ evidence }: { evidence: Evidence[] }) {
                 className={`max-w-[92%] min-w-0 sm:max-w-[88%] ${message.isFromOwner ? "text-right" : "text-left"}`}
               >
                 <div
-                  className="mb-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-muted"
+                  className="mb-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted"
                   style={{
                     justifyContent: message.isFromOwner
                       ? "flex-end"
@@ -63,18 +64,18 @@ export function EvidenceConversation({ evidence }: { evidence: Evidence[] }) {
                   ) : null}
                 </div>
                 {crossThread ? (
-                  <p className="mb-1.5 break-words text-[10px] text-muted">
+                  <p className="mb-1.5 break-words text-[13px] text-muted">
                     In chat with {message.threadName}
                   </p>
                 ) : null}
                 <blockquote
-                  className={`rounded-2xl border px-3.5 py-3 text-left text-[13px] leading-relaxed whitespace-pre-wrap break-words [overflow-wrap:anywhere] ${message.isFromOwner ? "rounded-br-sm bg-ember/10" : "rounded-bl-sm bg-card"} ${message.isKey ? "border-ember/45 text-bone" : "border-line text-muted"}`}
+                  className={`rounded-2xl border px-3.5 py-3 text-left text-[16px] leading-relaxed whitespace-pre-wrap break-words [overflow-wrap:anywhere] ${message.isFromOwner ? "rounded-br-sm bg-ember/10" : "rounded-bl-sm bg-card"} ${message.isKey ? "border-ember/45 text-bone" : "border-line text-muted"}`}
                 >
-                  {message.text}
+                  {withoutEmoji(message.text)}
                 </blockquote>
                 <time
                   dateTime={message.timestamp}
-                  className="mt-1.5 block text-[10px] text-muted"
+                  className="mt-1.5 block text-[13px] text-muted"
                 >
                   {displayTime(message.timestamp)}
                 </time>
