@@ -8,3 +8,9 @@ node_modules
 /data/private/
 *_chat.txt
 "WhatsApp Chat with "*.txt
+
+# Generated analysis output. These contain real messages from real exports.
+/cards.json
+/insights.json
+/*.cards.json
+/*.insights.json
