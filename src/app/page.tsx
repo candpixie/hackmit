@@ -7,38 +7,45 @@ import { Ranking } from "@/components/Ranking";
 import { Detail } from "@/components/Detail";
 import { Friendsgiving } from "@/components/Friendsgiving";
 import { Closest } from "@/components/Closest";
+import { useArchive } from "@/lib/useArchive";
 
 export default function Page() {
   const [report, setReport] = useState<Report | null>(null);
   const [selected, setSelected] = useState<TieView | null>(null);
   const [group, setGroup] = useState(false);
   const [closest, setClosest] = useState(false);
+  const { stage, error: loadError, load: loadArchive } = useArchive();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const run = useCallback(async (body: object | null) => {
-    setBusy(true);
-    setError(null);
-    try {
-      const res = body
-        ? await fetch("/api/analyse", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify(body),
-          })
-        : await fetch("/api/analyse");
+  const run = useCallback(
+    async (body: object | null) => {
+      setBusy(true);
+      setError(null);
+      try {
+        // Going through the shared loader is what publishes the session id the
+        // other surfaces read, so they stop falling back to the sample.
+        if (body) {
+          const data = await loadArchive(body as { localDir?: string });
+          if (!data) return;
+          setReport(data as Report);
+          setSelected((data as Report).ties[0] ?? null);
+          return;
+        }
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Could not read those exports.");
-
-      setReport(data as Report);
-      setSelected((data as Report).ties[0] ?? null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong.");
-    } finally {
-      setBusy(false);
-    }
-  }, []);
+        const res = await fetch("/api/analyse");
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error ?? "Could not read those exports.");
+        setReport(data as Report);
+        setSelected((data as Report).ties[0] ?? null);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Something went wrong.");
+      } finally {
+        setBusy(false);
+      }
+    },
+    [loadArchive]
+  );
 
   const load = useCallback(
     (files: { name: string; text: string }[] | null) => run(files ? { files } : null),
@@ -48,7 +55,15 @@ export default function Page() {
   const loadDir = useCallback((localDir: string) => run({ localDir }), [run]);
 
   if (!report) {
-    return <Landing onLoad={load} onLoadDir={loadDir} busy={busy} error={error} />;
+    return (
+      <Landing
+        onLoad={load}
+        onLoadDir={loadDir}
+        busy={busy}
+        stage={stage}
+        error={error ?? loadError}
+      />
+    );
   }
 
   if (group) {

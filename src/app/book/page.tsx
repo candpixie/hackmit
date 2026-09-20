@@ -15,6 +15,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Leaf } from "@/components/Leaf";
+import { useArchive } from "@/lib/useArchive";
+import { Loading } from "@/components/Loading";
 
 type Ev = {
   id: string;
@@ -74,13 +76,22 @@ function paginate(env: Envelope): Page[] {
 }
 
 export default function BookPage() {
+  const { archive, checked } = useArchive();
   const [env, setEnv] = useState<Envelope | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [i, setI] = useState(0);
   const drag = useRef<number | null>(null);
 
   useEffect(() => {
-    fetch("/api/cards")
+    if (!checked) return;
+
+    // Read whatever archive the other surfaces are on, so the book is not
+    // quietly about someone else.
+    const url = archive.session
+      ? `/api/cards?session=${encodeURIComponent(archive.session)}`
+      : "/api/cards";
+
+    fetch(url)
       .then(async (r) => {
         const b = await r.json();
         if (!r.ok) throw new Error(b.error ?? "Could not open the archive.");
@@ -88,7 +99,7 @@ export default function BookPage() {
       })
       .then(setEnv)
       .catch((e) => setError(e instanceof Error ? e.message : "Failed."));
-  }, []);
+  }, [checked, archive.session]);
 
   const pages = useMemo(() => (env ? paginate(env) : []), [env]);
 
@@ -120,9 +131,7 @@ export default function BookPage() {
   if (!env) {
     return (
       <main className="flex min-h-screen items-center justify-center px-6">
-        <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-faint">
-          Opening the archive…
-        </p>
+        <Loading stage="parsing" note="Opening the archive." />
       </main>
     );
   }
@@ -151,6 +160,16 @@ export default function BookPage() {
           </Leaf>
         ))}
       </div>
+
+      {!archive.session ? (
+        <p className="mt-6 w-full max-w-[1180px] rounded-md border border-line bg-card px-5 py-3 text-[13px] leading-relaxed text-muted">
+          This is the sample archive.{" "}
+          <a href="/" className="text-ember underline underline-offset-4">
+            Load your own
+          </a>{" "}
+          and every surface will use it.
+        </p>
+      ) : null}
 
       <div className="mt-7 flex w-full max-w-[1180px] items-center justify-between">
         <button
