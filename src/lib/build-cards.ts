@@ -164,9 +164,12 @@ function unanswered(ties: Tie[], threads: Thread[], owner: string, limit = 12): 
       evidence,
       action: {
         label: "Respond",
-        draft: `i just realised i never actually answered you about this. ${loop.quote
-          .slice(0, 60)
-          .toLowerCase()}… tell me where you landed with it?`,
+        // Never quote their question back at them. Name the gap, then ask.
+        draft: `ok this is ${
+          Math.round(
+            (Date.now() - loop.ts) / 86_400_000 / 30
+          )
+        } months late but i never actually answered you about this. what happened with it in the end?`,
       },
     });
   }

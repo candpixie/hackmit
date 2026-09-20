@@ -63,3 +63,34 @@ body::before {
     animation: none;
   }
 }
+
+@keyframes sweep {
+  from {
+    opacity: 0;
+    transform: translateX(-30%);
+  }
+  40% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(40%);
+  }
+}
+
+/* The stack of paper the open book sits on. */
+.book-stack::before,
+.book-stack::after {
+  content: "";
+  position: absolute;
+  inset: 8px -3px 6px;
+  border-radius: 4px;
+  background: var(--color-ink-soft);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.03);
+  z-index: -1;
+}
+
+.book-stack::after {
+  inset: 14px -7px 10px;
+  opacity: 0.6;
+}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Instrument_Serif, Inter } from "next/font/google";
 import "./globals.css";
+import { Surfaces } from "@/components/Surfaces";
 
 const display = Instrument_Serif({
   weight: "400",
@@ -21,9 +22,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable}`}>
+    // Browser extensions write attributes onto <html> before React loads,
+    // which React then reports as a hydration mismatch it cannot fix.
+    <html
+      lang="en"
+      className={`${display.variable} ${body.variable}`}
+      suppressHydrationWarning
+    >
       <body className="relative">
-        <div className="relative z-10">{children}</div>
+        <div className="relative z-10 pb-20">{children}</div>
+        <Surfaces />
       </body>
     </html>
   );
