@@ -89,6 +89,56 @@ thirty minute window, and the human sees the cart and the reasoning before
 anything moves. When the total exceeds the cap the agent changes the order and
 says which line it dropped. Sandbox throughout and labelled as such.
 
+## Demoing each track
+
+Two minutes each, on the live site or locally. Load the sample archive first;
+every tab then uses it.
+
+### Meta — Bringing People Closer Together with AI
+
+Open **Find**, click Mei Tanaka, and read the Unanswered card out loud: she
+asked something, you kept talking for weeks, and never came back to it. Press
+*Write to Mei*. Muse Spark writes a message that opens on that specific
+unfinished thread, and the evidence cards it used light up while the ones it
+ignored stay dark. Then open **Wrapped** and let someone else guess who you
+have ignored most before the reveal. The point to make: the finding is
+arithmetic, deliberately, so that every claim can point at a message. Muse does
+the two things arithmetic cannot, synthesising across five people's archives
+and writing the message you could not face writing, and its citations are
+validated against the supplied messages before the response returns.
+
+### Elastic — Find the Signal
+
+Open **Find**, press *Get them all in one room*, pick four people, and press
+*Find something they'd all want*. The response reports `backend:
+elasticsearch`. Every message was indexed with the engine's own classification
+flags, so the question and commitment patterns are filters rather than scans,
+and the planner asks one question of four hundred conversations at once: who
+has ever mentioned wanting this. The bug worth telling them about: we searched
+globally and filtered to the chosen people afterwards, and across four hundred
+conversations the top hits are almost never from the four you picked, so a plan
+for four friends was built from a single message. Moving the filter into the
+query took it from one candidate to twenty. Sessions also read back from the
+index, so the archive survives a restart.
+
+### Visa — Reimagine Shopping
+
+Same screen. Pick a plan, set the cap to 20, and press *Book this*.
+
+The hard part of commerce is knowing what someone wants. We never ask. Nobody
+typed "pottery class" into a search box: the intent was recovered from a
+message a friend sent fourteen months ago, in a different conversation, to
+somebody else. Discovery, personalisation and the decision all come out of
+evidence the buyer forgot they had.
+
+Then watch the guardrail. The agent never holds an open instrument: one
+merchant, one amount, one thirty minute window, and it shows the cart and its
+reasoning before anything moves. Over the cap it changes the order and says
+which line it dropped, and if that still is not enough it says *"Dropped
+Catalogue. Still $2.00 over the $20 cap"* rather than claiming a success it did
+not achieve. Sandbox throughout and labelled as such, because a demo that
+claims a real payment is a demo that lies.
+
 ## Run it
 
 ```bash
