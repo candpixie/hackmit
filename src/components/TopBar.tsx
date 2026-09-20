@@ -28,11 +28,20 @@ export function TopBar() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-ink/85 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-3 px-4 sm:gap-6 sm:px-6">
-        <a
-          href="/"
-          className="shrink-0 font-serif text-[17px] leading-none text-bone sm:text-[20px]"
-        >
-          Insta Insights
+        <a href="/" className="flex shrink-0 items-center gap-2.5">
+          {/* The ring, which is the one piece of Instagram nobody mistakes. */}
+          <span
+            className="grid h-[26px] w-[26px] place-items-center rounded-[9px] p-[2px]"
+            style={{ background: "var(--ig-ring)" }}
+            aria-hidden
+          >
+            <span className="grid h-full w-full place-items-center rounded-[7px] bg-ink font-serif text-[13px] leading-none text-bone">
+              i
+            </span>
+          </span>
+          <span className="font-serif text-[17px] leading-none text-bone sm:text-[20px]">
+            Insta Insights
+          </span>
         </a>
 
         {/* The four tabs plus the wordmark do not fit on a small phone, so the
@@ -55,7 +64,10 @@ export function TopBar() {
               >
                 {t.label}
                 {active ? (
-                  <span className="absolute inset-x-2 -bottom-[11px] h-[2px] rounded-full bg-ember sm:inset-x-3" />
+                  <span
+                    className="absolute inset-x-2 -bottom-[11px] h-[2px] rounded-full sm:inset-x-3"
+                    style={{ background: "var(--ig-hot)" }}
+                  />
                 ) : null}
               </a>
             );

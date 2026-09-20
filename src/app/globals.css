@@ -12,7 +12,38 @@
  * `bone` is always the primary text, so every component works in either.
  */
 
+/**
+ * One palette, taken from the DM surface so every screen matches it exactly
+ * rather than approximating it.
+ *
+ * These are Instagram's own values: true black, its greys, and its brand
+ * gradient. The gradient is an accent for rings, active states and one number
+ * per screen, never a background wash, because a gradient behind everything is
+ * the thing that reads as generated.
+ */
+
 @theme {
+  --color-ink: #000000;
+  --color-ink-soft: #121212;
+  --color-card: #1c1c1c;
+  --color-line: #2a2a2a;
+  --color-bone: #f5f5f5;
+  --color-muted: #c4c4c4;
+  --color-faint: #8e8e8e;
+  --color-ember: #e1306c;
+  --color-ember-dim: #833ab4;
+  --color-sage: #58c322;
+
+  --ig-ring: linear-gradient(45deg, #ffdc80 0%, #fcaf45 14%, #f77737 28%, #f56040 40%, #fd1d1d 50%, #e1306c 62%, #c13584 75%, #833ab4 88%, #5851db 100%);
+  --ig-hot: linear-gradient(135deg, #fcaf45 0%, #f56040 30%, #e1306c 62%, #833ab4 100%);
+
+  --font-serif: var(--font-display), ui-serif, Georgia, serif;
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Paper is kept as the alternate, since it is the one that does not look like
+   every other AI-built app. */
+:root[data-theme="paper"] {
   --color-ink: #f2eee5;
   --color-ink-soft: #e9e3d6;
   --color-card: #f8f5ee;
@@ -23,12 +54,10 @@
   --color-ember: #a8362a;
   --color-ember-dim: #e4c9c3;
   --color-sage: #46603f;
-
-  --font-serif: var(--font-display), ui-serif, Georgia, serif;
-  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
 }
 
-:root {
+
+:root[data-theme="paper"] {
   /* A sheet of paper casts a short, soft shadow. It does not glow. */
   --leaf-shadow: 0 0 0 1px rgba(0, 0, 0, 0.07), 14px 0 26px -20px rgba(60, 50, 35, 0.45);
   --gutter: linear-gradient(
@@ -46,38 +75,30 @@
   --sweep: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.5) 50%, transparent 65%);
 }
 
-:root[data-theme="dark"] {
-  --leaf-shadow: 0 0 0 1px rgba(255, 255, 255, 0.045), 24px 0 60px -30px rgba(0, 0, 0, 0.9);
+:root {
+  --leaf-shadow: 0 0 0 1px rgba(255, 255, 255, 0.07), 24px 0 60px -30px rgba(0, 0, 0, 0.95);
   --gutter: linear-gradient(to right, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.12) 45%, transparent);
   --gutter-verso: linear-gradient(to left, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.1) 50%, transparent);
   --sweep: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.05) 50%, transparent 65%);
 }
 
-:root[data-theme="dark"] {
-  --color-ink: #0e0d0c;
-  --color-ink-soft: #161413;
-  --color-card: #1c1917;
-  --color-line: #2b2724;
-  --color-bone: #efe9e1;
-  --color-muted: #9a918a;
-  --color-faint: #6b635d;
-  --color-ember: #e07c46;
-  --color-ember-dim: #7a4425;
-  --color-sage: #7d9070;
-}
 
 
 html {
-  color-scheme: light;
-}
-
-:root[data-theme="dark"] {
   color-scheme: dark;
 }
 
-:root[data-theme="dark"] body::before {
-  mix-blend-mode: normal;
-  opacity: 0.025;
+:root[data-theme="paper"] {
+  color-scheme: light;
+}
+
+/* No paper grain on black: it reads as noise, not tooth. */
+body::before {
+  display: none;
+}
+
+:root[data-theme="paper"] body::before {
+  display: block;
 }
 
 body {
