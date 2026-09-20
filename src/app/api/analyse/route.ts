@@ -159,13 +159,40 @@ export async function POST(req: Request) {
   return NextResponse.json(result, { status: "error" in result ? 400 : 200 });
 }
 
-/** The synthetic corpus, so the demo runs with nothing uploaded. */
+/**
+ * The synthetic corpus, so the demo runs with nothing uploaded.
+ *
+ * The Instagram one, deliberately. There are two, and they used to disagree:
+ * this endpoint served the WhatsApp corpus while /api/cards served the
+ * Instagram one, so the sample archive you loaded was not the archive the
+ * cards were built from and three of the card kinds had nothing to find. The
+ * landing page quotes the Instagram corpus, the product reads Instagram
+ * exports, so that is the one a sample load should give you.
+ *
+ * The WhatsApp corpus is still what `pnpm analyse` and the parser tests use.
+ */
 export async function GET() {
-  const dir = join(process.cwd(), "data", "corpus");
-  const names = (await readdir(dir)).filter((f) => extname(f) === ".txt");
+  const dir = join(process.cwd(), "data", "corpus-instagram", "inbox");
 
+  try {
+    const threads = await readInstagramDir(dir);
+    if (threads.length) {
+      const result = await build([], threads);
+      return NextResponse.json({ ...result, sample: true, source: "instagram" });
+    }
+  } catch {
+    // Not generated yet. Fall through to the WhatsApp corpus, which is
+    // committed, so the demo never hard-fails on a fresh clone.
+  }
+
+  const names = (await readdir(join(process.cwd(), "data", "corpus"))).filter(
+    (f) => extname(f) === ".txt"
+  );
   const uploads = await Promise.all(
-    names.map(async (name) => ({ name, text: await readFile(join(dir, name), "utf8") }))
+    names.map(async (name) => ({
+      name,
+      text: await readFile(join(process.cwd(), "data", "corpus", name), "utf8"),
+    }))
   );
 
   return NextResponse.json({ ...(await build(uploads)), sample: true });
