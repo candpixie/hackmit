@@ -1,25 +1,68 @@
-import type { Metadata } from "next";
+"use client";
+
+/**
+ * The dashboard reads the same card feed every other surface reads, from
+ * whatever archive the session points at. It was a server component fetching
+ * /api/cards with no session, which meant it always rendered the synthetic
+ * corpus no matter what the person had loaded.
+ */
+
+import { useEffect, useState } from "react";
 import type { CardsEnvelope } from "@/lib/cards";
 import { InsightsDashboard } from "@/components/insights/InsightsDashboard";
+import { useArchive } from "@/lib/useArchive";
+import { Loading } from "@/components/Loading";
 
-export const metadata: Metadata = {
-  title: "Insights · Your conversations, rediscovered",
-  description:
-    "The people, memories, and plans tucked inside your conversations.",
-};
+export default function InsightsPage() {
+  const { archive, checked } = useArchive();
+  const [envelope, setEnvelope] = useState<CardsEnvelope | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-// Live cards from the engine. Falls back to the synthetic corpus when no
-// session is supplied, so this page always renders something.
-export const dynamic = "force-dynamic";
+  useEffect(() => {
+    if (!checked) return;
 
-async function load(): Promise<CardsEnvelope> {
-  const base = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3111";
-  const res = await fetch(`${base}/api/cards`, { cache: "no-store" });
-  if (!res.ok) throw new Error("Could not load cards.");
-  return (await res.json()) as CardsEnvelope;
-}
+    const url = archive.session
+      ? `/api/cards?session=${encodeURIComponent(archive.session)}`
+      : "/api/cards";
 
-export default async function InsightsPage() {
-  const envelope = await load();
-  return <InsightsDashboard envelope={envelope} />;
+    fetch(url, { cache: "no-store" })
+      .then(async (r) => {
+        const b = await r.json();
+        if (!r.ok) throw new Error(b.error ?? "Could not load your insights.");
+        return b as CardsEnvelope;
+      })
+      .then(setEnvelope)
+      .catch((e) => setError(e instanceof Error ? e.message : "Failed."));
+  }, [checked, archive.session]);
+
+  if (error) {
+    return (
+      <main className="flex min-h-screen items-center justify-center px-6">
+        <p className="text-[15px] text-ember">{error}</p>
+      </main>
+    );
+  }
+
+  if (!envelope) {
+    return (
+      <main className="flex min-h-screen items-center justify-center px-6">
+        <Loading stage="scoring" note="Reading your archive." />
+      </main>
+    );
+  }
+
+  return (
+    <>
+      {!archive.session ? (
+        <p className="mx-auto max-w-3xl px-6 pt-6 text-[13px] leading-relaxed text-muted">
+          This is the sample archive.{" "}
+          <a href="/" className="text-ember underline underline-offset-4">
+            Load your own
+          </a>{" "}
+          and every surface will use it.
+        </p>
+      ) : null}
+      <InsightsDashboard envelope={envelope} />
+    </>
+  );
 }
