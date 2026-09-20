@@ -64,9 +64,7 @@ export function Leaf({
         className="absolute inset-0 overflow-hidden rounded-r-[3px] bg-ink"
         style={{
           backfaceVisibility: "hidden",
-          boxShadow: turned
-            ? "none"
-            : "0 0 0 1px rgba(255,255,255,0.045), 24px 0 60px -30px rgba(0,0,0,0.9)",
+          boxShadow: turned ? "none" : "var(--leaf-shadow)",
         }}
       >
         <div
@@ -78,21 +76,14 @@ export function Leaf({
         {/* the gutter: darker paper where the page meets the spine */}
         <div
           className="pointer-events-none absolute inset-y-0 left-0 w-20"
-          style={{
-            background:
-              "linear-gradient(to right, rgba(0,0,0,0.55), rgba(0,0,0,0.12) 45%, transparent)",
-          }}
+          style={{ background: "var(--gutter)" }}
         />
 
         {/* light sweeping across the leaf as it lifts */}
         {animating ? (
           <div
             className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.05) 50%, transparent 65%)",
-              animation: "sweep 900ms ease-out",
-            }}
+            style={{ background: "var(--sweep)", animation: "sweep 900ms ease-out" }}
           />
         ) : null}
       </div>
@@ -107,10 +98,7 @@ export function Leaf({
       >
         <div
           className="pointer-events-none absolute inset-y-0 right-0 w-24"
-          style={{
-            background:
-              "linear-gradient(to left, rgba(0,0,0,0.5), rgba(0,0,0,0.1) 50%, transparent)",
-          }}
+          style={{ background: "var(--gutter-verso)" }}
         />
         {back ?? null}
       </div>

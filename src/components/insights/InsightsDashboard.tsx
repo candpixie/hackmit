@@ -12,56 +12,6 @@ export function InsightsDashboard({ envelope }: { envelope: CardsEnvelope }) {
       >
         Skip to insights
       </a>
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-line py-6 sm:py-7">
-        <Link
-          href="/insights"
-          className="flex items-center gap-3 text-bone"
-          aria-label="Insights home"
-        >
-          <svg
-            width="28"
-            height="28"
-            viewBox="0 0 28 28"
-            fill="none"
-            className="text-ember"
-            aria-hidden="true"
-          >
-            <circle
-              cx="10"
-              cy="14"
-              r="8"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            />
-            <circle
-              cx="18"
-              cy="14"
-              r="8"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            />
-            <circle cx="14" cy="14" r="2" fill="currentColor" />
-          </svg>
-          <span className="font-serif text-3xl tracking-tight">Insights</span>
-        </Link>
-        <nav
-          aria-label="Dashboard"
-          className="flex flex-wrap items-center gap-5 text-xs text-muted sm:gap-7"
-        >
-          <a href="#your-people" className="py-2 hover:text-bone">
-            Your people
-          </a>
-          <a href="#insights-feed" className="py-2 hover:text-bone">
-            Your insights
-          </a>
-          <Link
-            href="/"
-            className="rounded-full border border-line px-3 py-2 hover:border-muted hover:text-bone"
-          >
-            Archive tools ↗
-          </Link>
-        </nav>
-      </header>
       <main id="insights-content" className="pb-16">
         <div className="flex flex-col justify-between gap-6 pt-11 pb-10 sm:flex-row sm:items-end sm:pt-14 sm:pb-12">
           <div>

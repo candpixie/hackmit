@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Instrument_Serif, Inter } from "next/font/google";
 import "./globals.css";
-import { Surfaces } from "@/components/Surfaces";
+import { TopBar } from "@/components/TopBar";
 
 const display = Instrument_Serif({
   weight: "400",
@@ -30,8 +30,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
     >
       <body className="relative">
-        <div className="relative z-10 pb-20">{children}</div>
-        <Surfaces />
+        <div className="relative z-10">
+          <TopBar />
+          {children}
+        </div>
       </body>
     </html>
   );

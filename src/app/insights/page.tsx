@@ -53,15 +53,6 @@ export default function InsightsPage() {
 
   return (
     <>
-      {!archive.session ? (
-        <p className="mx-auto max-w-3xl px-6 pt-6 text-[13px] leading-relaxed text-muted">
-          This is the sample archive.{" "}
-          <a href="/" className="text-ember underline underline-offset-4">
-            Load your own
-          </a>{" "}
-          and every surface will use it.
-        </p>
-      ) : null}
       <InsightsDashboard envelope={envelope} />
     </>
   );

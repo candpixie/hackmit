@@ -161,15 +161,6 @@ export default function BookPage() {
         ))}
       </div>
 
-      {!archive.session ? (
-        <p className="mt-6 w-full max-w-[1180px] rounded-md border border-line bg-card px-5 py-3 text-[13px] leading-relaxed text-muted">
-          This is the sample archive.{" "}
-          <a href="/" className="text-ember underline underline-offset-4">
-            Load your own
-          </a>{" "}
-          and every surface will use it.
-        </p>
-      ) : null}
 
       <div className="mt-7 flex w-full max-w-[1180px] items-center justify-between">
         <button
